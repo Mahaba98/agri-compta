@@ -1,0 +1,183 @@
+classDiagram
+  class Utilisateur {
+    +Long id
+    +String nom
+    +String prenom
+    +String email
+    +String motDePasse
+    +Role role
+    +boolean actif
+    +LocalDateTime dateCreation
+  }
+
+  class CampagneAgricole {
+    +Long id
+    +String nom
+    +LocalDate dateDebut
+    +LocalDate dateFin
+    +StatutCampagne statut
+  }
+
+  class Parcelle {
+    +Long id
+    +String nom
+    +BigDecimal superficieHa
+    +String localisation
+    +String typeSol
+    +String typeIrrigation
+    +String description
+  }
+
+  class Culture {
+    +Long id
+    +String nom
+    +String variete
+    +BigDecimal surfaceHa
+    +LocalDate dateSemis
+    +LocalDate dateRecoltePrevue
+    +LocalDate dateRecolteReelle
+    +StatutCulture statut
+  }
+
+  class OperationAgricole {
+    +Long id
+    +TypeOperation typeOperation
+    +LocalDate dateOperation
+    +String description
+    +BigDecimal coutMainOeuvre
+    +LocalDateTime dateCreation
+  }
+
+  class Recolte {
+    +Long id
+    +LocalDate dateRecolte
+    +BigDecimal quantite
+    +String unite
+    +BigDecimal prixUnitaire
+    +BigDecimal montantTotal
+    +String observation
+    +LocalDateTime dateCreation
+  }
+
+  class Depense {
+    +Long id
+    +String libelle
+    +BigDecimal montant
+    +LocalDate dateDepense
+    +String modePaiement
+    +String referencePiece
+    +LocalDateTime dateCreation
+  }
+
+  class Recette {
+    +Long id
+    +String libelle
+    +BigDecimal montant
+    +LocalDate dateRecette
+    +BigDecimal quantite
+    +String unite
+    +BigDecimal prixUnitaire
+    +LocalDateTime dateCreation
+  }
+
+  class CategorieDepense {
+    +Long id
+    +String nom
+    +String description
+  }
+
+  class ProduitStock {
+    +Long id
+    +String nom
+    +TypeProduit typeProduit
+    +String unite
+    +BigDecimal quantiteDisponible
+    +BigDecimal seuilAlerte
+    +BigDecimal prixUnitaireMoyen
+    +LocalDateTime dateCreation
+  }
+
+  class MouvementStock {
+    +Long id
+    +TypeMouvement typeMouvement
+    +BigDecimal quantite
+    +BigDecimal prixUnitaire
+    +LocalDate dateMouvement
+    +String motif
+    +LocalDateTime dateCreation
+  }
+
+  class Role {
+    <<enumeration>>
+    ADMIN
+    AGRICULTEUR
+    COMPTABLE
+  }
+
+  class StatutCampagne {
+    <<enumeration>>
+    PLANIFIEE
+    EN_COURS
+    TERMINEE
+  }
+
+  class StatutCulture {
+    <<enumeration>>
+    PLANIFIEE
+    EN_COURS
+    RECOLTEE
+    ANNULEE
+  }
+
+  class TypeOperation {
+    <<enumeration>>
+    SEMIS
+    FERTILISATION
+    IRRIGATION
+    TRAITEMENT
+    RECOLTE
+    LABOUR
+    DESHERBAGE
+    AUTRE
+  }
+
+  class TypeProduit {
+    <<enumeration>>
+    SEMENCE
+    ENGRAIS
+    PRODUIT_PHYTOSANITAIRE
+    CARBURANT
+    ALIMENT
+    MATERIEL_CONSOMMABLE
+    AUTRE
+  }
+
+  class TypeMouvement {
+    <<enumeration>>
+    ENTREE
+    SORTIE
+    AJUSTEMENT
+  }
+
+  CampagneAgricole "1" --> "0..*" Culture : contient
+  Parcelle "1" --> "0..*" Culture : accueille
+  Culture "1" --> "0..*" OperationAgricole : opérations
+  Culture "1" --> "0..*" Recolte : récoltes
+  Culture "1" --> "0..*" Depense : dépenses
+  Culture "1" --> "0..*" Recette : recettes
+  Culture "0..1" --> "0..*" MouvementStock : mouvements liés
+  OperationAgricole "0..1" --> "0..*" Depense : génère
+  OperationAgricole "0..1" --> "0..*" MouvementStock : utilise stock
+  CategorieDepense "1" --> "0..*" Depense : classe
+  ProduitStock "1" --> "0..*" MouvementStock : mouvements
+  Utilisateur "1" --> "0..*" OperationAgricole : saisit
+  Utilisateur "1" --> "0..*" Recolte : saisit
+  Utilisateur "1" --> "0..*" Depense : saisit
+  Utilisateur "1" --> "0..*" Recette : saisit
+  Utilisateur "1" --> "0..*" MouvementStock : saisit
+  Utilisateur --> Role
+  CampagneAgricole --> StatutCampagne
+  Culture --> StatutCulture
+  OperationAgricole --> TypeOperation
+  ProduitStock --> TypeProduit
+  MouvementStock --> TypeMouvement

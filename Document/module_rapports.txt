@@ -1,0 +1,40 @@
+MODULE RAPPORTS
+
+Le module Rapports permet de produire une synthèse des données agricoles, financières et de stock enregistrées dans l'application. Il aide l'administrateur et le comptable à analyser la situation de l'exploitation et à préparer les informations nécessaires à la prise de décision.
+
+1. Accès au module
+
+Le module est accessible aux utilisateurs disposant du rôle ADMIN ou COMPTABLE. L'accès est contrôlé côté frontend par l'affichage conditionnel du menu, et côté backend par le filtre d'authentification.
+
+2. Filtres disponibles
+
+L'utilisateur peut filtrer le rapport selon une date de début, une date de fin, une campagne agricole et une culture. Ces critères permettent d'obtenir une synthèse adaptée à une période ou à une activité particulière.
+
+Le backend vérifie également la cohérence de la période. Une date de début postérieure à la date de fin entraîne le rejet de la requête.
+
+3. Indicateurs présentés
+
+Le rapport affiche le total des dépenses, le total des recettes, le bénéfice, la quantité récoltée, la valeur estimée du stock, le nombre de stocks faibles, le nombre d'opérations agricoles et le nombre de récoltes.
+
+4. Synthèse par culture
+
+Une table présente les résultats pour chaque culture : campagne, parcelle, surface cultivée, dépenses, recettes, bénéfice, quantité récoltée et nombre d'opérations.
+
+Cette synthèse permet de comparer les cultures et d'identifier celles qui génèrent les meilleurs résultats ou les charges les plus importantes.
+
+5. Export Excel
+
+Le backend propose un endpoint d'export au format CSV compatible avec Microsoft Excel. Le fichier reprend les lignes du rapport ainsi que les totaux financiers et agricoles.
+
+6. Export PDF
+
+L'interface Angular propose une mise en page d'impression dédiée. Lors de l'export PDF, la navigation et les filtres sont masqués afin de conserver uniquement le titre, les indicateurs et la table du rapport. L'utilisateur peut ensuite enregistrer le document au format PDF depuis la boîte de dialogue d'impression du navigateur.
+
+7. APIs du module
+
+- GET /api/rapports/synthese : génération de la synthèse filtrée ;
+- GET /api/rapports/export.csv : téléchargement du rapport compatible Excel.
+
+Conclusion
+
+Le module Rapports complète les fonctionnalités de gestion de l'application en transformant les données enregistrées en informations utiles à l'analyse. Il facilite le suivi de la rentabilité, de la production et de l'état des stocks de l'exploitation agricole.

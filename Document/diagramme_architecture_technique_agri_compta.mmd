@@ -1,0 +1,45 @@
+flowchart LR
+    U[Utilisateur\nADMIN / AGRICULTEUR / COMPTABLE]
+    B[Navigateur web]
+    F[Frontend Angular\nPages, formulaires, tableaux, rapports]
+    T[Token localStorage\nAuthorization: Bearer]
+    A[API REST Spring Boot\nControllers + DTO]
+    AUTH[Authentification\n/api/auth/login\nFiltre token\nContrôle des rôles]
+    S[Services métier\nGestion agricole\nComptabilité\nStock\nRapports filtrés]
+    E[Exports\nCSV compatible Excel\nImpression PDF]
+    R[Repositories JPA]
+    DB[(PostgreSQL\nTables métier)]
+
+    U --> B
+    B --> F
+    F -->|Login email + mot de passe| AUTH
+    AUTH -->|Token signé| F
+    F --> T
+    T -->|Bearer token| A
+    A --> AUTH
+    AUTH -->|Accès autorisé selon rôle| S
+    S --> E
+    E --> F
+    S --> R
+    R --> DB
+    DB --> R
+    R --> S
+    S --> A
+    A -->|JSON| F
+
+    subgraph Frontend
+      F
+      T
+    end
+
+    subgraph Backend
+      A
+      AUTH
+      S
+      E
+      R
+    end
+
+    subgraph Donnees
+      DB
+    end

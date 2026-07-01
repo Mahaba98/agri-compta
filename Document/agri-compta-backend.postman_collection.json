@@ -1,0 +1,732 @@
+{
+  "info": {
+    "_postman_id": "8f9b78f4-0f24-4f5c-b07b-9c6f02c9b091",
+    "name": "Agri Compta Backend - API Tests",
+    "description": "Collection de test du backend Spring Boot de gestion comptable agricole. Exécuter d'abord 00 - Connexion administrateur afin d'enregistrer le token Bearer.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "utilisateur_id",
+      "value": ""
+    },
+    {
+      "key": "campagne_id",
+      "value": ""
+    },
+    {
+      "key": "parcelle_id",
+      "value": ""
+    },
+    {
+      "key": "culture_id",
+      "value": ""
+    },
+    {
+      "key": "operation_id",
+      "value": ""
+    },
+    {
+      "key": "produit_stock_id",
+      "value": ""
+    },
+    {
+      "key": "categorie_id",
+      "value": "1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "recolte_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Connexion administrateur",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@touba-agoro.local\",\n  \"motDePasse\": \"admin123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Connexion réussie', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('token', data.token);",
+              "pm.collectionVariables.set('utilisateur_id', data.utilisateur.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Tableau de bord initial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "dashboard"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - Lister les categories de depenses",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('La liste des categories est retournee', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const categories = pm.response.json();",
+              "if (Array.isArray(categories) && categories.length > 0) {",
+              "  pm.collectionVariables.set('categorie_id', categories[0].id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/categories-depenses",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "categories-depenses"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Creer un utilisateur agriculteur",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Utilisateur cree', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('utilisateur_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Diop\",\n  \"prenom\": \"Moussa\",\n  \"email\": \"moussa.diop.test@example.com\",\n  \"motDePasse\": \"password123\",\n  \"role\": \"AGRICULTEUR\",\n  \"actif\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/utilisateurs",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "utilisateurs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Creer une campagne agricole",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Campagne creee', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('campagne_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Campagne hivernage 2026\",\n  \"dateDebut\": \"2026-06-01\",\n  \"dateFin\": \"2026-11-30\",\n  \"statut\": \"EN_COURS\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/campagnes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "campagnes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Creer une parcelle",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Parcelle creee', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('parcelle_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Parcelle Nord\",\n  \"superficieHa\": 4.5,\n  \"localisation\": \"Zone de Richard-Toll\",\n  \"typeSol\": \"Argilo-sableux\",\n  \"description\": \"Parcelle principale reservee a la culture du riz.\",\n  \"typeIrrigation\": \"Goutte à goutte\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/parcelles",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "parcelles"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Creer une culture",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Culture creee', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('culture_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Riz\",\n  \"variete\": \"Sahel 108\",\n  \"surfaceHa\": 3.25,\n  \"dateSemis\": \"2026-06-15\",\n  \"dateRecoltePrevue\": \"2026-10-20\",\n  \"dateRecolteReelle\": null,\n  \"statut\": \"EN_COURS\",\n  \"campagneId\": {{campagne_id}},\n  \"parcelleId\": {{parcelle_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/cultures",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "cultures"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 - Creer une operation agricole",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Operation creee', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('operation_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"typeOperation\": \"SEMIS\",\n  \"dateOperation\": \"2026-06-16\",\n  \"description\": \"Semis manuel sur la parcelle Nord.\",\n  \"coutMainOeuvre\": 25000,\n  \"cultureId\": {{culture_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/operations-agricoles",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "operations-agricoles"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 - Enregistrer une depense",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"libelle\": \"Achat de semences de riz\",\n  \"montant\": 180000,\n  \"dateDepense\": \"2026-06-10\",\n  \"modePaiement\": \"ESPECES\",\n  \"referencePiece\": \"FACT-SEM-001\",\n  \"cultureId\": {{culture_id}},\n  \"categorieId\": {{categorie_id}},\n  \"operationAgricoleId\": {{operation_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/depenses",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "depenses"
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 - Enregistrer une recette",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"libelle\": \"Vente previsionnelle de riz\",\n  \"montant\": 450000,\n  \"dateRecette\": \"2026-10-25\",\n  \"quantite\": 1500,\n  \"unite\": \"KG\",\n  \"prixUnitaire\": 300,\n  \"cultureId\": {{culture_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/recettes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recettes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10 - Creer un produit en stock",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Produit stock cree', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('produit_stock_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Uree 46%\",\n  \"typeProduit\": \"ENGRAIS\",\n  \"unite\": \"SAC\",\n  \"quantiteDisponible\": 0,\n  \"seuilAlerte\": 5,\n  \"prixUnitaireMoyen\": 18000\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/produits-stock",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "produits-stock"
+          ]
+        }
+      }
+    },
+    {
+      "name": "11 - Entree de stock",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"typeMouvement\": \"ENTREE\",\n  \"quantite\": 20,\n  \"prixUnitaire\": 18000,\n  \"dateMouvement\": \"2026-06-11\",\n  \"motif\": \"Achat initial d'engrais\",\n  \"produitStockId\": {{produit_stock_id}},\n  \"cultureId\": null,\n  \"operationAgricoleId\": null,\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/mouvements-stock",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "mouvements-stock"
+          ]
+        }
+      }
+    },
+    {
+      "name": "12 - Sortie de stock pour une culture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"typeMouvement\": \"SORTIE\",\n  \"quantite\": 6,\n  \"prixUnitaire\": 18000,\n  \"dateMouvement\": \"2026-06-18\",\n  \"motif\": \"Utilisation pour fertilisation\",\n  \"produitStockId\": {{produit_stock_id}},\n  \"cultureId\": {{culture_id}},\n  \"operationAgricoleId\": {{operation_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/mouvements-stock",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "mouvements-stock"
+          ]
+        }
+      }
+    },
+    {
+      "name": "13 - Tester stock insuffisant",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('La sortie est refusee si le stock est insuffisant', function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"typeMouvement\": \"SORTIE\",\n  \"quantite\": 9999,\n  \"prixUnitaire\": 18000,\n  \"dateMouvement\": \"2026-06-19\",\n  \"motif\": \"Test de stock insuffisant\",\n  \"produitStockId\": {{produit_stock_id}},\n  \"cultureId\": {{culture_id}},\n  \"operationAgricoleId\": {{operation_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/mouvements-stock",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "mouvements-stock"
+          ]
+        }
+      }
+    },
+    {
+      "name": "14 - Lister les produits en alerte",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/produits-stock/alertes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "produits-stock",
+            "alertes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "15 - Tableau de bord apres donnees de test",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "dashboard"
+          ]
+        }
+      }
+    },
+    {
+      "name": "16 - Lister toutes les cultures",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/cultures",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "cultures"
+          ]
+        }
+      }
+    },
+    {
+      "name": "17 - Lister toutes les depenses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/depenses",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "depenses"
+          ]
+        }
+      }
+    },
+    {
+      "name": "18 - Lister toutes les recettes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/recettes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recettes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "19 - Enregistrer une recolte",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/recoltes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recoltes"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dateRecolte\": \"2026-10-25\",\n  \"quantite\": 1500,\n  \"unite\": \"KG\",\n  \"prixUnitaire\": 300,\n  \"montantTotal\": 450000,\n  \"observation\": \"Première récolte de la campagne\",\n  \"cultureId\": {{culture_id}},\n  \"utilisateurId\": {{utilisateur_id}}\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Récolte enregistrée', function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('recolte_id', data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 - Rapport de synthese",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/rapports/synthese",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "rapports",
+            "synthese"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Rapport généré', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "pm.expect(data).to.have.property('totalDepenses');",
+              "pm.expect(data).to.have.property('cultures');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 - Export rapport Excel compatible CSV",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/rapports/export.csv",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "rapports",
+            "export.csv"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Export CSV généré', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  }
+}

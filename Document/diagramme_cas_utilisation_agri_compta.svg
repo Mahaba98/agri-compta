@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="980" viewBox="0 0 1500 980">
+  <defs>
+    <style>
+      .bg { fill: #f3f8f7; }
+      .title { font: 700 34px Arial, sans-serif; fill: #064f94; }
+      .subtitle { font: 600 18px Arial, sans-serif; fill: #24465e; }
+      .actor-label { font: 700 17px Arial, sans-serif; fill: #10233f; text-anchor: middle; }
+      .system { fill: #ffffff; stroke: #064f94; stroke-width: 3; rx: 18; }
+      .system-title { font: 700 22px Arial, sans-serif; fill: #064f94; text-anchor: middle; }
+      .usecase { fill: #ffffff; stroke: #087d43; stroke-width: 2.5; }
+      .usecase-text { font: 600 15px Arial, sans-serif; fill: #10233f; text-anchor: middle; dominant-baseline: middle; }
+      .line { stroke: #49656f; stroke-width: 2; fill: none; }
+      .admin-line { stroke: #064f94; stroke-width: 2.4; fill: none; }
+      .comptable-line { stroke: #087d43; stroke-width: 2.4; fill: none; }
+      .note { fill: #fff8df; stroke: #e2b93b; stroke-width: 2; rx: 10; }
+      .note-text { font: 600 14px Arial, sans-serif; fill: #5c4810; }
+      .legend { font: 600 14px Arial, sans-serif; fill: #49656f; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1500" height="980"/>
+  <text class="title" x="750" y="55" text-anchor="middle">Diagramme de cas d'utilisation</text>
+  <text class="subtitle" x="750" y="88" text-anchor="middle">Application de gestion comptable agricole - Touba Agoro</text>
+
+  <rect class="system" x="310" y="130" width="880" height="745"/>
+  <text class="system-title" x="750" y="170">Système Agri-Compta</text>
+
+  <!-- Actors -->
+  <g transform="translate(145 245)">
+    <circle cx="0" cy="0" r="24" fill="#ffffff" stroke="#064f94" stroke-width="3"/>
+    <line x1="0" y1="24" x2="0" y2="92" stroke="#064f94" stroke-width="3"/>
+    <line x1="-45" y1="52" x2="45" y2="52" stroke="#064f94" stroke-width="3"/>
+    <line x1="0" y1="92" x2="-42" y2="150" stroke="#064f94" stroke-width="3"/>
+    <line x1="0" y1="92" x2="42" y2="150" stroke="#064f94" stroke-width="3"/>
+    <text class="actor-label" x="0" y="188">ADMIN</text>
+  </g>
+
+  <g transform="translate(145 610)">
+    <circle cx="0" cy="0" r="24" fill="#ffffff" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="24" x2="0" y2="92" stroke="#087d43" stroke-width="3"/>
+    <line x1="-45" y1="52" x2="45" y2="52" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="92" x2="-42" y2="150" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="92" x2="42" y2="150" stroke="#087d43" stroke-width="3"/>
+    <text class="actor-label" x="0" y="188">AGRICULTEUR</text>
+  </g>
+
+  <g transform="translate(1345 610)">
+    <circle cx="0" cy="0" r="24" fill="#ffffff" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="24" x2="0" y2="92" stroke="#087d43" stroke-width="3"/>
+    <line x1="-45" y1="52" x2="45" y2="52" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="92" x2="-42" y2="150" stroke="#087d43" stroke-width="3"/>
+    <line x1="0" y1="92" x2="42" y2="150" stroke="#087d43" stroke-width="3"/>
+    <text class="actor-label" x="0" y="188">COMPTABLE</text>
+  </g>
+
+  <!-- Use cases -->
+  <ellipse class="usecase" cx="500" cy="235" rx="135" ry="38"/>
+  <text class="usecase-text" x="500" y="235">Se connecter</text>
+
+  <ellipse class="usecase" cx="760" cy="235" rx="155" ry="38"/>
+  <text class="usecase-text" x="760" y="235">Gérer les utilisateurs</text>
+
+  <ellipse class="usecase" cx="1005" cy="235" rx="120" ry="38"/>
+  <text class="usecase-text" x="1005" y="235">Gérer les rôles</text>
+
+  <ellipse class="usecase" cx="505" cy="350" rx="150" ry="38"/>
+  <text class="usecase-text" x="505" y="350">Gérer les campagnes</text>
+
+  <ellipse class="usecase" cx="755" cy="350" rx="135" ry="38"/>
+  <text class="usecase-text" x="755" y="350">Gérer les parcelles</text>
+
+  <ellipse class="usecase" cx="1005" cy="350" rx="125" ry="38"/>
+  <text class="usecase-text" x="1005" y="350">Gérer les cultures</text>
+
+  <ellipse class="usecase" cx="505" cy="465" rx="165" ry="38"/>
+  <text class="usecase-text" x="505" y="465">Gérer les opérations</text>
+
+  <ellipse class="usecase" cx="755" cy="465" rx="130" ry="38"/>
+  <text class="usecase-text" x="755" y="465">Gérer les récoltes</text>
+
+  <ellipse class="usecase" cx="1005" cy="465" rx="135" ry="38"/>
+  <text class="usecase-text" x="1005" y="465">Gérer les stocks</text>
+
+  <ellipse class="usecase" cx="505" cy="580" rx="135" ry="38"/>
+  <text class="usecase-text" x="505" y="580">Gérer les dépenses</text>
+
+  <ellipse class="usecase" cx="755" cy="580" rx="130" ry="38"/>
+  <text class="usecase-text" x="755" y="580">Gérer les recettes</text>
+
+  <ellipse class="usecase" cx="1005" cy="580" rx="160" ry="38"/>
+  <text class="usecase-text" x="1005" y="580">Suivre la rentabilité</text>
+
+  <ellipse class="usecase" cx="630" cy="705" rx="180" ry="38"/>
+  <text class="usecase-text" x="630" y="705">Consulter le tableau de bord</text>
+
+  <ellipse class="usecase" cx="900" cy="705" rx="165" ry="38"/>
+  <text class="usecase-text" x="900" y="705">Consulter les rapports</text>
+
+  <ellipse class="usecase" cx="900" cy="805" rx="165" ry="38"/>
+  <text class="usecase-text" x="900" y="805">Exporter PDF / Excel</text>
+
+  <!-- Associations: Admin -->
+  <path class="admin-line" d="M190 298 L372 235"/>
+  <path class="admin-line" d="M190 298 L612 235"/>
+  <path class="admin-line" d="M190 298 L888 235"/>
+  <path class="admin-line" d="M190 298 L370 350"/>
+  <path class="admin-line" d="M190 298 L627 350"/>
+  <path class="admin-line" d="M190 298 L885 350"/>
+  <path class="admin-line" d="M190 298 L370 465"/>
+  <path class="admin-line" d="M190 298 L630 465"/>
+  <path class="admin-line" d="M190 298 L880 465"/>
+  <path class="admin-line" d="M190 298 L380 580"/>
+  <path class="admin-line" d="M190 298 L640 580"/>
+  <path class="admin-line" d="M190 298 L860 580"/>
+  <path class="admin-line" d="M190 298 L470 705"/>
+  <path class="admin-line" d="M190 298 L810 705"/>
+  <path class="admin-line" d="M190 298 L760 805"/>
+
+  <!-- Associations: Agriculteur -->
+  <path class="line" d="M190 663 L370 350"/>
+  <path class="line" d="M190 663 L627 350"/>
+  <path class="line" d="M190 663 L885 350"/>
+  <path class="line" d="M190 663 L370 465"/>
+  <path class="line" d="M190 663 L630 465"/>
+  <path class="line" d="M190 663 L880 465"/>
+  <path class="line" d="M190 663 L470 705"/>
+
+  <!-- Associations: Comptable -->
+  <path class="comptable-line" d="M1300 663 L1140 465"/>
+  <path class="comptable-line" d="M1300 663 L630 580"/>
+  <path class="comptable-line" d="M1300 663 L885 580"/>
+  <path class="comptable-line" d="M1300 663 L1145 580"/>
+  <path class="comptable-line" d="M1300 663 L1045 705"/>
+  <path class="comptable-line" d="M1300 663 L810 705"/>
+  <path class="comptable-line" d="M1300 663 L1065 805"/>
+
+  <!-- Shared login -->
+  <path class="line" d="M190 663 L370 235"/>
+  <path class="line" d="M1300 663 L635 235"/>
+
+  <rect class="note" x="325" y="895" width="850" height="58"/>
+  <text class="note-text" x="345" y="920">Perspective future : rendre l'application multi-exploitations / multi-champs, avec logo, page de connexion</text>
+  <text class="note-text" x="345" y="940">et données séparées pour chaque exploitation.</text>
+</svg>

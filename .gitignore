@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+out-tsc/
+
+# Tool caches
+.angular/
+.gradle/
+.mvn/
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Generated render folders
+render_*/
+render_sections_*/

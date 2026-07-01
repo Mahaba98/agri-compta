@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1290" viewBox="0 0 1700 1290">
+  <defs>
+    <style>
+      .bg { fill: #f3f8f7; }
+      .title { font: 700 34px Arial, sans-serif; fill: #064f94; }
+      .subtitle { font: 600 18px Arial, sans-serif; fill: #24465e; }
+      .class-box { fill: #ffffff; stroke: #064f94; stroke-width: 2.4; rx: 8; }
+      .class-box.green { stroke: #087d43; }
+      .class-head { fill: #064f94; }
+      .class-head.green { fill: #087d43; }
+      .class-name { font: 700 16px Arial, sans-serif; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
+      .attr { font: 13px Consolas, 'Courier New', monospace; fill: #10233f; }
+      .relation { stroke: #49656f; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .relation.green { stroke: #087d43; }
+      .relation.blue { stroke: #064f94; }
+      .rel-label { font: 700 12px Arial, sans-serif; fill: #24465e; paint-order: stroke; stroke: #f3f8f7; stroke-width: 4px; }
+      .enum-box { fill: #fff8df; stroke: #e2b93b; stroke-width: 2; rx: 8; }
+      .enum-head { fill: #e2b93b; }
+      .enum-name { font: 700 15px Arial, sans-serif; fill: #10233f; text-anchor: middle; dominant-baseline: middle; }
+      .note { font: 600 13px Arial, sans-serif; fill: #567074; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#49656f"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1700" height="1290"/>
+  <text class="title" x="850" y="48" text-anchor="middle">Diagramme de classes</text>
+  <text class="subtitle" x="850" y="80" text-anchor="middle">Application de gestion comptable agricole - Touba Agoro</text>
+
+  <!-- Top classes -->
+  <g transform="translate(50 125)">
+    <rect class="class-box" width="270" height="205"/>
+    <rect class="class-head" width="270" height="38" rx="8"/>
+    <text class="class-name" x="135" y="20">Utilisateur</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ prenom : String</text>
+    <text class="attr" x="14" y="128">+ email : String</text>
+    <text class="attr" x="14" y="150">+ motDePasse : String</text>
+    <text class="attr" x="14" y="172">+ role : Role</text>
+    <text class="attr" x="14" y="194">+ actif : boolean</text>
+  </g>
+
+  <g transform="translate(400 125)">
+    <rect class="class-box" width="285" height="165"/>
+    <rect class="class-head" width="285" height="38" rx="8"/>
+    <text class="class-name" x="142" y="20">CampagneAgricole</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ dateDebut : LocalDate</text>
+    <text class="attr" x="14" y="128">+ dateFin : LocalDate</text>
+    <text class="attr" x="14" y="150">+ statut : StatutCampagne</text>
+  </g>
+
+  <g transform="translate(760 125)">
+    <rect class="class-box" width="300" height="185"/>
+    <rect class="class-head" width="300" height="38" rx="8"/>
+    <text class="class-name" x="150" y="20">Parcelle</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ superficieHa : BigDecimal</text>
+    <text class="attr" x="14" y="128">+ localisation : String</text>
+    <text class="attr" x="14" y="150">+ typeSol : String</text>
+    <text class="attr" x="14" y="172">+ typeIrrigation : String</text>
+  </g>
+
+  <g transform="translate(1160 125)">
+    <rect class="class-box green" width="330" height="225"/>
+    <rect class="class-head green" width="330" height="38" rx="8"/>
+    <text class="class-name" x="165" y="20">Culture</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ variete : String</text>
+    <text class="attr" x="14" y="128">+ surfaceHa : BigDecimal</text>
+    <text class="attr" x="14" y="150">+ dateSemis : LocalDate</text>
+    <text class="attr" x="14" y="172">+ dateRecoltePrevue : LocalDate</text>
+    <text class="attr" x="14" y="194">+ dateRecolteReelle : LocalDate</text>
+    <text class="attr" x="14" y="216">+ statut : StatutCulture</text>
+  </g>
+
+  <!-- Middle classes -->
+  <g transform="translate(80 455)">
+    <rect class="class-box green" width="330" height="185"/>
+    <rect class="class-head green" width="330" height="38" rx="8"/>
+    <text class="class-name" x="165" y="20">OperationAgricole</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ typeOperation : TypeOperation</text>
+    <text class="attr" x="14" y="106">+ dateOperation : LocalDate</text>
+    <text class="attr" x="14" y="128">+ description : String</text>
+    <text class="attr" x="14" y="150">+ coutMainOeuvre : BigDecimal</text>
+    <text class="attr" x="14" y="172">+ dateCreation : LocalDateTime</text>
+  </g>
+
+  <g transform="translate(505 455)">
+    <rect class="class-box green" width="300" height="205"/>
+    <rect class="class-head green" width="300" height="38" rx="8"/>
+    <text class="class-name" x="150" y="20">Recolte</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ dateRecolte : LocalDate</text>
+    <text class="attr" x="14" y="106">+ quantite : BigDecimal</text>
+    <text class="attr" x="14" y="128">+ unite : String</text>
+    <text class="attr" x="14" y="150">+ prixUnitaire : BigDecimal</text>
+    <text class="attr" x="14" y="172">+ montantTotal : BigDecimal</text>
+    <text class="attr" x="14" y="194">+ observation : String</text>
+  </g>
+
+  <g transform="translate(900 455)">
+    <rect class="class-box green" width="305" height="205"/>
+    <rect class="class-head green" width="305" height="38" rx="8"/>
+    <text class="class-name" x="152" y="20">Depense</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ libelle : String</text>
+    <text class="attr" x="14" y="106">+ montant : BigDecimal</text>
+    <text class="attr" x="14" y="128">+ dateDepense : LocalDate</text>
+    <text class="attr" x="14" y="150">+ modePaiement : String</text>
+    <text class="attr" x="14" y="172">+ referencePiece : String</text>
+    <text class="attr" x="14" y="194">+ dateCreation : LocalDateTime</text>
+  </g>
+
+  <g transform="translate(1300 455)">
+    <rect class="class-box green" width="300" height="205"/>
+    <rect class="class-head green" width="300" height="38" rx="8"/>
+    <text class="class-name" x="150" y="20">Recette</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ libelle : String</text>
+    <text class="attr" x="14" y="106">+ montant : BigDecimal</text>
+    <text class="attr" x="14" y="128">+ dateRecette : LocalDate</text>
+    <text class="attr" x="14" y="150">+ quantite : BigDecimal</text>
+    <text class="attr" x="14" y="172">+ unite : String</text>
+    <text class="attr" x="14" y="194">+ prixUnitaire : BigDecimal</text>
+  </g>
+
+  <!-- Bottom classes -->
+  <g transform="translate(120 790)">
+    <rect class="class-box" width="300" height="125"/>
+    <rect class="class-head" width="300" height="38" rx="8"/>
+    <text class="class-name" x="150" y="20">CategorieDepense</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ description : String</text>
+  </g>
+
+  <g transform="translate(560 780)">
+    <rect class="class-box" width="330" height="205"/>
+    <rect class="class-head" width="330" height="38" rx="8"/>
+    <text class="class-name" x="165" y="20">ProduitStock</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ nom : String</text>
+    <text class="attr" x="14" y="106">+ typeProduit : TypeProduit</text>
+    <text class="attr" x="14" y="128">+ unite : String</text>
+    <text class="attr" x="14" y="150">+ quantiteDisponible : BigDecimal</text>
+    <text class="attr" x="14" y="172">+ seuilAlerte : BigDecimal</text>
+    <text class="attr" x="14" y="194">+ prixUnitaireMoyen : BigDecimal</text>
+  </g>
+
+  <g transform="translate(1035 770)">
+    <rect class="class-box" width="340" height="205"/>
+    <rect class="class-head" width="340" height="38" rx="8"/>
+    <text class="class-name" x="170" y="20">MouvementStock</text>
+    <text class="attr" x="14" y="62">+ id : Long</text>
+    <text class="attr" x="14" y="84">+ typeMouvement : TypeMouvement</text>
+    <text class="attr" x="14" y="106">+ quantite : BigDecimal</text>
+    <text class="attr" x="14" y="128">+ prixUnitaire : BigDecimal</text>
+    <text class="attr" x="14" y="150">+ dateMouvement : LocalDate</text>
+    <text class="attr" x="14" y="172">+ motif : String</text>
+    <text class="attr" x="14" y="194">+ dateCreation : LocalDateTime</text>
+  </g>
+
+  <!-- Enums -->
+  <g transform="translate(80 1045)">
+    <rect class="enum-box" width="1480" height="185"/>
+    <rect class="enum-head" width="1480" height="34" rx="8"/>
+    <text class="enum-name" x="740" y="18">Énumérations</text>
+    <text class="attr" x="28" y="62">Role : ADMIN, AGRICULTEUR, COMPTABLE</text>
+    <text class="attr" x="28" y="84">StatutCampagne : PLANIFIEE, EN_COURS, TERMINEE</text>
+    <text class="attr" x="28" y="106">StatutCulture : PLANIFIEE, EN_COURS, RECOLTEE, ANNULEE</text>
+    <text class="attr" x="28" y="128">TypeOperation : SEMIS, FERTILISATION, IRRIGATION, TRAITEMENT, RECOLTE, LABOUR, DESHERBAGE, AUTRE</text>
+    <text class="attr" x="28" y="150">TypeProduit : SEMENCE, ENGRAIS, PRODUIT_PHYTOSANITAIRE, CARBURANT, ALIMENT, MATERIEL_CONSOMMABLE, AUTRE</text>
+    <text class="attr" x="28" y="172">TypeMouvement : ENTREE, SORTIE, AJUSTEMENT</text>
+  </g>
+
+  <!-- Relations -->
+  <path class="relation blue" d="M685 207 L1160 230"/>
+  <text class="rel-label" x="850" y="200">1 campagne -> 0..* cultures</text>
+
+  <path class="relation blue" d="M1060 220 L1160 235"/>
+  <text class="rel-label" x="1068" y="205">1 parcelle -> 0..* cultures</text>
+
+  <path class="relation green" d="M1185 350 L390 455"/>
+  <text class="rel-label" x="685" y="392">1 culture -> 0..* opérations</text>
+
+  <path class="relation green" d="M1230 350 L665 455"/>
+  <text class="rel-label" x="820" y="408">1 culture -> 0..* récoltes</text>
+
+  <path class="relation green" d="M1310 350 L1015 455"/>
+  <text class="rel-label" x="1138" y="405">1 culture -> 0..* dépenses</text>
+
+  <path class="relation green" d="M1440 350 L1465 455"/>
+  <text class="rel-label" x="1460" y="405">1 culture -> 0..* recettes</text>
+
+  <path class="relation" d="M270 790 L940 660"/>
+  <text class="rel-label" x="475" y="720">1 catégorie -> 0..* dépenses</text>
+
+  <path class="relation" d="M850 885 L1035 875"/>
+  <text class="rel-label" x="910" y="860">1 produit -> 0..* mouvements</text>
+
+  <path class="relation" d="M1205 770 L1250 350"/>
+  <text class="rel-label" x="1220" y="720">mouvement lié à une culture</text>
+
+  <path class="relation" d="M1110 770 L310 640"/>
+  <text class="rel-label" x="610" y="700">mouvement lié à une opération</text>
+
+  <path class="relation blue" d="M320 230 L210 455"/>
+  <text class="rel-label" x="210" y="385">utilisateur</text>
+
+  <path class="relation blue" d="M320 250 L560 455"/>
+  <text class="rel-label" x="430" y="390">utilisateur</text>
+
+  <path class="relation blue" d="M320 270 L930 455"/>
+  <text class="rel-label" x="620" y="365">utilisateur</text>
+
+  <path class="relation blue" d="M320 290 L1330 455"/>
+  <text class="rel-label" x="815" y="350">utilisateur</text>
+
+  <path class="relation blue" d="M260 330 L1110 770"/>
+  <text class="rel-label" x="520" y="590">utilisateur</text>
+
+  <path class="relation" d="M355 640 L930 660"/>
+  <text class="rel-label" x="530" y="665">1 opération -> 0..* dépenses</text>
+
+  <text class="note" x="80" y="1260">Lecture : les relations expriment les principales associations métier implémentées côté backend. Les multiplicités sont indiquées sur les libellés des associations.</text>
+</svg>

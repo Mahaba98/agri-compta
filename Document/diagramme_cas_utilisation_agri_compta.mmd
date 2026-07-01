@@ -1,0 +1,56 @@
+flowchart LR
+  ADMIN[ADMIN]
+  AGRI[AGRICULTEUR]
+  COMPTA[COMPTABLE]
+
+  subgraph SYSTEME[Application de gestion comptable agricole]
+    UC_LOGIN((Se connecter))
+    UC_USERS((Gérer les utilisateurs))
+    UC_ROLES((Gérer les rôles))
+    UC_CAMP((Gérer les campagnes))
+    UC_PARC((Gérer les parcelles))
+    UC_CULT((Gérer les cultures))
+    UC_OP((Gérer les opérations agricoles))
+    UC_REC((Gérer les récoltes))
+    UC_STOCK((Gérer les stocks))
+    UC_DEP((Gérer les dépenses))
+    UC_REVENUE((Gérer les recettes))
+    UC_RENT((Suivre la rentabilité))
+    UC_DASH((Consulter le tableau de bord))
+    UC_REPORT((Consulter les rapports))
+    UC_EXPORT((Exporter PDF / Excel))
+  end
+
+  ADMIN --- UC_LOGIN
+  ADMIN --- UC_USERS
+  ADMIN --- UC_ROLES
+  ADMIN --- UC_CAMP
+  ADMIN --- UC_PARC
+  ADMIN --- UC_CULT
+  ADMIN --- UC_OP
+  ADMIN --- UC_REC
+  ADMIN --- UC_STOCK
+  ADMIN --- UC_DEP
+  ADMIN --- UC_REVENUE
+  ADMIN --- UC_RENT
+  ADMIN --- UC_DASH
+  ADMIN --- UC_REPORT
+  ADMIN --- UC_EXPORT
+
+  AGRI --- UC_LOGIN
+  AGRI --- UC_CAMP
+  AGRI --- UC_PARC
+  AGRI --- UC_CULT
+  AGRI --- UC_OP
+  AGRI --- UC_REC
+  AGRI --- UC_STOCK
+  AGRI --- UC_DASH
+
+  COMPTA --- UC_LOGIN
+  COMPTA --- UC_STOCK
+  COMPTA --- UC_DEP
+  COMPTA --- UC_REVENUE
+  COMPTA --- UC_RENT
+  COMPTA --- UC_DASH
+  COMPTA --- UC_REPORT
+  COMPTA --- UC_EXPORT

@@ -1,0 +1,141 @@
+erDiagram
+    UTILISATEURS {
+        bigint id PK
+        varchar nom
+        varchar prenom
+        varchar email UK
+        varchar mot_de_passe
+        varchar role
+        boolean actif
+        timestamp date_creation
+    }
+
+    CAMPAGNES_AGRICOLES {
+        bigint id PK
+        varchar nom
+        date date_debut
+        date date_fin
+        varchar statut
+    }
+
+    PARCELLES {
+        bigint id PK
+        varchar nom
+        numeric superficie_ha
+        varchar localisation
+        varchar type_sol
+        varchar type_irrigation
+        text description
+    }
+
+    CULTURES {
+        bigint id PK
+        varchar nom
+        varchar variete
+        numeric surface_ha
+        date date_semis
+        date date_recolte_prevue
+        date date_recolte_reelle
+        varchar statut
+        bigint campagne_id FK
+        bigint parcelle_id FK
+    }
+
+    OPERATIONS_AGRICOLES {
+        bigint id PK
+        varchar type_operation
+        date date_operation
+        text description
+        numeric cout_main_oeuvre
+        bigint culture_id FK
+        bigint utilisateur_id FK
+        timestamp date_creation
+    }
+
+    RECOLTES {
+        bigint id PK
+        date date_recolte
+        numeric quantite
+        varchar unite
+        numeric prix_unitaire
+        numeric montant_total
+        text observation
+        bigint culture_id FK
+        bigint utilisateur_id FK
+        timestamp date_creation
+    }
+
+    DEPENSES {
+        bigint id PK
+        varchar libelle
+        numeric montant
+        date date_depense
+        varchar mode_paiement
+        varchar reference_piece
+        bigint culture_id FK
+        bigint categorie_id FK
+        bigint operation_agricole_id FK
+        bigint utilisateur_id FK
+        timestamp date_creation
+    }
+
+    RECETTES {
+        bigint id PK
+        varchar libelle
+        numeric montant
+        date date_recette
+        numeric quantite
+        varchar unite
+        numeric prix_unitaire
+        bigint culture_id FK
+        bigint utilisateur_id FK
+        timestamp date_creation
+    }
+
+    CATEGORIES_DEPENSES {
+        bigint id PK
+        varchar nom UK
+        text description
+    }
+
+    PRODUITS_STOCK {
+        bigint id PK
+        varchar nom
+        varchar type_produit
+        varchar unite
+        numeric quantite_disponible
+        numeric seuil_alerte
+        numeric prix_unitaire_moyen
+        timestamp date_creation
+    }
+
+    MOUVEMENTS_STOCK {
+        bigint id PK
+        varchar type_mouvement
+        numeric quantite
+        numeric prix_unitaire
+        date date_mouvement
+        varchar motif
+        bigint produit_stock_id FK
+        bigint culture_id FK
+        bigint operation_agricole_id FK
+        bigint utilisateur_id FK
+        timestamp date_creation
+    }
+
+    CAMPAGNES_AGRICOLES ||--o{ CULTURES : contient
+    PARCELLES ||--o{ CULTURES : accueille
+    CULTURES ||--o{ OPERATIONS_AGRICOLES : possede
+    CULTURES ||--o{ RECOLTES : produit
+    CULTURES ||--o{ DEPENSES : supporte
+    CULTURES ||--o{ RECETTES : genere
+    CULTURES ||--o{ MOUVEMENTS_STOCK : concerne
+    OPERATIONS_AGRICOLES ||--o{ DEPENSES : rattache
+    OPERATIONS_AGRICOLES ||--o{ MOUVEMENTS_STOCK : utilise
+    CATEGORIES_DEPENSES ||--o{ DEPENSES : classe
+    PRODUITS_STOCK ||--o{ MOUVEMENTS_STOCK : historise
+    UTILISATEURS ||--o{ OPERATIONS_AGRICOLES : saisit
+    UTILISATEURS ||--o{ RECOLTES : saisit
+    UTILISATEURS ||--o{ DEPENSES : saisit
+    UTILISATEURS ||--o{ RECETTES : saisit
+    UTILISATEURS ||--o{ MOUVEMENTS_STOCK : saisit

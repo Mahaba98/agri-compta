@@ -59,6 +59,13 @@ interface LoginResponse {
   utilisateur: AuthUser;
 }
 
+interface TokenPayload {
+  utilisateurId: number;
+  role: UserRole;
+  email: string;
+  expiresAt: number;
+}
+
 interface RapportCulture {
   cultureId: number;
   culture: string;
@@ -108,7 +115,7 @@ export class App {
   readonly loading = signal(false);
   readonly message = signal('');
   readonly error = signal('');
-  readonly authToken = signal<string | null>(localStorage.getItem('agri-compta-token'));
+  readonly authToken = signal<string | null>(this.readStoredToken());
   readonly currentUser = signal<AuthUser | null>(this.readStoredUser());
 
   readonly dashboard = signal<Dashboard | null>(null);
@@ -291,8 +298,7 @@ export class App {
     this.clearNotice();
     this.http.post<LoginResponse>(`${this.api}/auth/login`, this.loginForm.getRawValue()).subscribe({
       next: (response) => {
-        localStorage.setItem('agri-compta-token', response.token);
-        localStorage.setItem('agri-compta-user', JSON.stringify(response.utilisateur));
+        this.storeAuth(response.token, response.utilisateur);
         this.authToken.set(response.token);
         this.currentUser.set(response.utilisateur);
         this.loginForm.reset({ email: '', motDePasse: '' });
@@ -308,8 +314,7 @@ export class App {
   }
 
   logout(): void {
-    localStorage.removeItem('agri-compta-token');
-    localStorage.removeItem('agri-compta-user');
+    this.clearStoredAuth();
     this.authToken.set(null);
     this.currentUser.set(null);
     this.selected.set(null);
@@ -749,15 +754,69 @@ export class App {
   }
 
   private readStoredUser(): AuthUser | null {
-    const value = localStorage.getItem('agri-compta-user');
+    if (!this.readStoredToken()) {
+      return null;
+    }
+
+    const value = sessionStorage.getItem('agri-compta-user');
     if (!value) {
       return null;
     }
     try {
       return JSON.parse(value) as AuthUser;
     } catch {
-      localStorage.removeItem('agri-compta-user');
-      localStorage.removeItem('agri-compta-token');
+      this.clearStoredAuth();
+      return null;
+    }
+  }
+
+  private storeAuth(token: string, utilisateur: AuthUser): void {
+    sessionStorage.setItem('agri-compta-token', token);
+    sessionStorage.setItem('agri-compta-user', JSON.stringify(utilisateur));
+    localStorage.removeItem('agri-compta-token');
+    localStorage.removeItem('agri-compta-user');
+  }
+
+  private readStoredToken(): string | null {
+    localStorage.removeItem('agri-compta-token');
+    localStorage.removeItem('agri-compta-user');
+
+    const token = sessionStorage.getItem('agri-compta-token');
+    if (!token || this.isTokenExpired(token)) {
+      this.clearStoredAuth();
+      return null;
+    }
+    return token;
+  }
+
+  private clearStoredAuth(): void {
+    sessionStorage.removeItem('agri-compta-token');
+    sessionStorage.removeItem('agri-compta-user');
+    localStorage.removeItem('agri-compta-token');
+    localStorage.removeItem('agri-compta-user');
+  }
+
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodeToken(token);
+    return !payload || payload.expiresAt <= Math.floor(Date.now() / 1000);
+  }
+
+  private decodeToken(token: string): TokenPayload | null {
+    const encodedPayload = token.split('.')[0];
+    if (!encodedPayload) {
+      return null;
+    }
+
+    try {
+      const payload = atob(encodedPayload.replace(/-/g, '+').replace(/_/g, '/'));
+      const [utilisateurId, role, email, expiresAt] = payload.split('|');
+      return {
+        utilisateurId: Number(utilisateurId),
+        role: role as UserRole,
+        email,
+        expiresAt: Number(expiresAt),
+      };
+    } catch {
       return null;
     }
   }
@@ -1021,7 +1080,11 @@ export class App {
   }
 
   private readError(err: unknown): string {
-    const value = err as { error?: { message?: string; errors?: Record<string, string> }; message?: string };
+    const value = err as { status?: number; error?: { message?: string; errors?: Record<string, string> }; message?: string };
+    if (value.status === 401) {
+      this.logout();
+      return 'Session expiree. Veuillez vous reconnecter.';
+    }
     if (value.error?.errors && Object.keys(value.error.errors).length) {
       return Object.values(value.error.errors).join(' ');
     }

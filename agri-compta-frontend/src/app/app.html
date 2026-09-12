@@ -282,6 +282,25 @@
               </div>
             </section>
           } @else {
+          <div class="list-toolbar">
+            <label class="search-field">Recherche
+              <input
+                type="search"
+                [value]="searchTerm()"
+                (input)="updateSearch($any($event.target).value)"
+                placeholder="Rechercher dans la liste"
+              />
+            </label>
+            <label class="page-size-field">Lignes
+              <select [value]="pageSize()" (change)="updatePageSize($any($event.target).value)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </label>
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -293,7 +312,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (item of listForCurrentSection(); track item.id) {
+                @for (item of paginatedListForCurrentSection(); track item.id) {
                   <tr>
                     @for (column of listColumns(); track column.label) {
                       <td>{{ column.value(item) }}</td>
@@ -305,11 +324,22 @@
                   </tr>
                 } @empty {
                   <tr>
-                    <td [attr.colspan]="listColumns().length + 1">Aucun élément enregistré.</td>
+                    <td [attr.colspan]="listColumns().length + 1">
+                      {{ searchTerm() ? 'Aucun élément ne correspond à la recherche.' : 'Aucun élément enregistré.' }}
+                    </td>
                   </tr>
                 }
               </tbody>
             </table>
+          </div>
+
+          <div class="pagination-bar">
+            <span>{{ pageStart() }}-{{ pageEnd() }} sur {{ totalItems() }}</span>
+            <div class="pagination-actions">
+              <button type="button" class="secondary small" (click)="previousPage()" [disabled]="pageIndex() <= 1">Précédent</button>
+              <strong>Page {{ currentPage() }} / {{ totalPages() }}</strong>
+              <button type="button" class="secondary small" (click)="nextPage()" [disabled]="pageIndex() >= totalPages()">Suivant</button>
+            </div>
           </div>
           }
         }

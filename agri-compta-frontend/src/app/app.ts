@@ -112,6 +112,9 @@ export class App {
   readonly mode = signal<ViewMode>('list');
   readonly stockFormKind = signal<StockFormKind>('produit');
   readonly selected = signal<Entity | null>(null);
+  readonly searchTerm = signal('');
+  readonly pageIndex = signal(1);
+  readonly pageSize = signal(10);
   readonly loading = signal(false);
   readonly message = signal('');
   readonly error = signal('');
@@ -304,6 +307,7 @@ export class App {
         this.loginForm.reset({ email: '', motDePasse: '' });
         this.section.set('dashboard');
         this.mode.set('list');
+        this.resetListControls();
         this.loadAll();
       },
       error: (err) => {
@@ -320,6 +324,7 @@ export class App {
     this.selected.set(null);
     this.section.set('dashboard');
     this.mode.set('list');
+    this.resetListControls();
     this.clearNotice();
   }
 
@@ -327,6 +332,7 @@ export class App {
     this.section.set(section);
     this.mode.set('list');
     this.selected.set(null);
+    this.resetListControls();
     this.clearNotice();
     if (section === 'rapports') {
       this.loadRapport();
@@ -375,6 +381,7 @@ export class App {
   backToList(): void {
     this.mode.set('list');
     this.selected.set(null);
+    this.ensureValidPage();
     this.clearNotice();
   }
 
@@ -518,6 +525,7 @@ export class App {
       next: () => {
         this.message.set('Mouvement de stock enregistré.');
         this.mode.set('list');
+        this.resetListControls();
         this.loadAll();
       },
       error: (err) => {
@@ -550,6 +558,63 @@ export class App {
       default:
         return [];
     }
+  }
+
+  filteredListForCurrentSection(): Entity[] {
+    const term = this.searchTerm().trim().toLocaleLowerCase();
+    const items = this.listForCurrentSection();
+    if (!term) {
+      return items;
+    }
+    return items.filter((item) => this.searchableText(item).includes(term));
+  }
+
+  paginatedListForCurrentSection(): Entity[] {
+    const currentPage = Math.min(Math.max(this.pageIndex(), 1), this.totalPages());
+    const start = (currentPage - 1) * this.pageSize();
+    return this.filteredListForCurrentSection().slice(start, start + this.pageSize());
+  }
+
+  totalItems(): number {
+    return this.filteredListForCurrentSection().length;
+  }
+
+  totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalItems() / this.pageSize()));
+  }
+
+  currentPage(): number {
+    return Math.min(Math.max(this.pageIndex(), 1), this.totalPages());
+  }
+
+  pageStart(): number {
+    if (this.totalItems() === 0) {
+      return 0;
+    }
+    const currentPage = this.currentPage();
+    return (currentPage - 1) * this.pageSize() + 1;
+  }
+
+  pageEnd(): number {
+    return Math.min(this.currentPage() * this.pageSize(), this.totalItems());
+  }
+
+  updateSearch(value: string): void {
+    this.searchTerm.set(value);
+    this.pageIndex.set(1);
+  }
+
+  updatePageSize(value: string): void {
+    this.pageSize.set(Number(value) || 10);
+    this.pageIndex.set(1);
+  }
+
+  previousPage(): void {
+    this.pageIndex.set(Math.max(1, this.pageIndex() - 1));
+  }
+
+  nextPage(): void {
+    this.pageIndex.set(Math.min(this.totalPages(), this.pageIndex() + 1));
   }
 
   listColumns(): ListColumn[] {
@@ -722,6 +787,7 @@ export class App {
         this.message.set(successMessage);
         this.mode.set('list');
         this.selected.set(null);
+        this.resetListControls();
         this.loadAll();
       },
       error: (err) => {
@@ -740,6 +806,43 @@ export class App {
   private authOptions(): { headers: Record<string, string> } {
     const token = this.authToken();
     return token ? { headers: { Authorization: `Bearer ${token}` } } : { headers: {} };
+  }
+
+  private resetListControls(): void {
+    this.searchTerm.set('');
+    this.pageIndex.set(1);
+  }
+
+  private ensureValidPage(): void {
+    const lastPage = this.totalPages();
+    if (this.pageIndex() > lastPage) {
+      this.pageIndex.set(lastPage);
+    }
+    if (this.pageIndex() < 1) {
+      this.pageIndex.set(1);
+    }
+  }
+
+  private searchableText(item: Entity): string {
+    const columnText = this.listColumns().map((column) => column.value(item));
+    return [
+      this.itemTitle(item),
+      ...columnText,
+      ...this.flattenSearchValues(item),
+    ].join(' ').toLocaleLowerCase();
+  }
+
+  private flattenSearchValues(value: unknown): string[] {
+    if (value === null || value === undefined) {
+      return [];
+    }
+    if (typeof value !== 'object') {
+      return [String(value)];
+    }
+    if (Array.isArray(value)) {
+      return value.flatMap((item) => this.flattenSearchValues(item));
+    }
+    return Object.values(value as Record<string, unknown>).flatMap((item) => this.flattenSearchValues(item));
   }
 
   private rapportQuery(): string {

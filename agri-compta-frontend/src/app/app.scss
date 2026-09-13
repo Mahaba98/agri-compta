@@ -313,7 +313,7 @@ button:disabled {
 
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.8fr);
+  grid-template-columns: minmax(760px, 2.5fr) minmax(240px, 0.7fr);
   gap: 14px;
 }
 
@@ -557,6 +557,12 @@ textarea {
   resize: vertical;
 }
 
+@media (max-width: 1180px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -571,7 +577,6 @@ textarea {
   }
 
   .metrics,
-  .split,
   .form-grid,
   .report-filters,
   .detail-panel dl {

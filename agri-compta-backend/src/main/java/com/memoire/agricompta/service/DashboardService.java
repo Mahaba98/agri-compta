@@ -1,8 +1,10 @@
 package com.memoire.agricompta.service;
 
 import com.memoire.agricompta.domain.entity.Culture;
+import com.memoire.agricompta.domain.entity.OperationAgricole;
 import com.memoire.agricompta.repository.CultureRepository;
 import com.memoire.agricompta.repository.DepenseRepository;
+import com.memoire.agricompta.repository.OperationAgricoleRepository;
 import com.memoire.agricompta.repository.ProduitStockRepository;
 import com.memoire.agricompta.repository.RecetteRepository;
 import com.memoire.agricompta.web.dto.CultureRentabiliteResponse;
@@ -19,12 +21,14 @@ public class DashboardService {
     private final DepenseRepository depenseRepository;
     private final RecetteRepository recetteRepository;
     private final CultureRepository cultureRepository;
+    private final OperationAgricoleRepository operationRepository;
     private final ProduitStockRepository produitStockRepository;
 
     public DashboardResponse getDashboard() {
         BigDecimal totalDepenses = depenseRepository.totalDepenses();
+        BigDecimal totalOperations = sumOperations(operationRepository.findAll());
         BigDecimal totalRecettes = recetteRepository.totalRecettes();
-        BigDecimal beneficeGlobal = totalRecettes.subtract(totalDepenses);
+        BigDecimal beneficeGlobal = totalRecettes.subtract(totalDepenses).subtract(totalOperations);
 
         List<CultureRentabiliteResponse> rentabilites = cultureRepository.findAll().stream()
                 .map(this::rentabiliteCulture)
@@ -32,6 +36,7 @@ public class DashboardService {
 
         return new DashboardResponse(
                 totalDepenses,
+                totalOperations,
                 totalRecettes,
                 beneficeGlobal,
                 rentabilites,
@@ -40,7 +45,11 @@ public class DashboardService {
     }
 
     private CultureRentabiliteResponse rentabiliteCulture(Culture culture) {
-        BigDecimal coutTotal = depenseRepository.totalByCultureId(culture.getId());
+        BigDecimal totalDepenses = depenseRepository.totalByCultureId(culture.getId());
+        BigDecimal totalOperations = sumOperations(operationRepository.findAll().stream()
+                .filter(operation -> operation.getCulture().getId().equals(culture.getId()))
+                .toList());
+        BigDecimal coutTotal = totalDepenses.add(totalOperations);
         BigDecimal recetteTotale = recetteRepository.totalByCultureId(culture.getId());
         BigDecimal benefice = recetteTotale.subtract(coutTotal);
         BigDecimal surface = culture.getSurfaceHa();
@@ -51,12 +60,20 @@ public class DashboardService {
                 culture.getId(),
                 culture.getNom(),
                 surface,
+                totalDepenses,
+                totalOperations,
                 coutTotal,
                 recetteTotale,
                 benefice,
                 coutParHectare,
                 margeParHectare
         );
+    }
+
+    private BigDecimal sumOperations(List<OperationAgricole> operations) {
+        return operations.stream()
+                .map(OperationAgricole::getCoutMainOeuvre)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal divide(BigDecimal amount, BigDecimal divisor) {

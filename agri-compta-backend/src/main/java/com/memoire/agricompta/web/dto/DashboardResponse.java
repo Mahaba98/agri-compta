@@ -6,6 +6,7 @@ import java.util.List;
 
 public record DashboardResponse(
         BigDecimal totalDepenses,
+        BigDecimal totalOperations,
         BigDecimal totalRecettes,
         BigDecimal beneficeGlobal,
         List<CultureRentabiliteResponse> rentabilites,

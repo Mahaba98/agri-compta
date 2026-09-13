@@ -94,12 +94,16 @@
             <strong>{{ formatAmount(dashboard()?.totalDepenses) }}</strong>
           </article>
           <article>
+            <span>Opérations</span>
+            <strong>{{ formatAmount(dashboard()?.totalOperations) }}</strong>
+          </article>
+          <article>
             <span>Recettes</span>
             <strong>{{ formatAmount(dashboard()?.totalRecettes) }}</strong>
           </article>
           <article [class.positive]="(dashboard()?.beneficeGlobal ?? 0) >= 0" [class.negative]="(dashboard()?.beneficeGlobal ?? 0) < 0">
-            <span>Bénéfice global</span>
-            <strong>{{ formatAmount(dashboard()?.beneficeGlobal) }}</strong>
+            <span>{{ resultLabel(dashboard()?.beneficeGlobal) }} global</span>
+            <strong>{{ formatAbsoluteAmount(dashboard()?.beneficeGlobal) }}</strong>
           </article>
           <article>
             <span>Stocks faibles</span>
@@ -116,9 +120,11 @@
                   <tr>
                     <th>Culture</th>
                     <th>Surface</th>
+                    <th>Dépenses</th>
+                    <th>Opérations</th>
                     <th>Coût</th>
                     <th>Recette</th>
-                    <th>Marge</th>
+                    <th>Résultat</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -126,13 +132,15 @@
                     <tr>
                       <td>{{ row.culture }}</td>
                       <td>{{ row.surfaceHa }} ha</td>
+                      <td>{{ formatAmount(row.totalDepenses) }}</td>
+                      <td>{{ formatAmount(row.totalOperations) }}</td>
                       <td>{{ formatAmount(row.coutTotal) }}</td>
                       <td>{{ formatAmount(row.recetteTotale) }}</td>
-                      <td>{{ formatAmount(row.benefice) }}</td>
+                      <td>{{ resultLabel(row.benefice) }} : {{ formatAbsoluteAmount(row.benefice) }}</td>
                     </tr>
                   } @empty {
                     <tr>
-                      <td colspan="5">Aucune culture enregistrée.</td>
+                      <td colspan="7">Aucune culture enregistrée.</td>
                     </tr>
                   }
                 </tbody>

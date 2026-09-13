@@ -15,6 +15,7 @@ interface Entity {
 
 interface Dashboard {
   totalDepenses: number;
+  totalOperations: number;
   totalRecettes: number;
   beneficeGlobal: number;
   rentabilites: RentabiliteCulture[];
@@ -25,6 +26,8 @@ interface RentabiliteCulture {
   cultureId: number;
   culture: string;
   surfaceHa: number;
+  totalDepenses: number;
+  totalOperations: number;
   coutTotal: number;
   recetteTotale: number;
   benefice: number;
@@ -774,6 +777,14 @@ export class App {
       currency: 'XOF',
       maximumFractionDigits: 0,
     }).format(value ?? 0);
+  }
+
+  formatAbsoluteAmount(value: number | null | undefined): string {
+    return this.formatAmount(Math.abs(value ?? 0));
+  }
+
+  resultLabel(value: number | null | undefined): string {
+    return (value ?? 0) < 0 ? 'Perte' : 'Bénéfice';
   }
 
   private save(path: string, payload: unknown, successMessage: string): void {

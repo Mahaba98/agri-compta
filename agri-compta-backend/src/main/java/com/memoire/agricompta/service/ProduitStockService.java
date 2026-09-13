@@ -12,13 +12,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProduitStockService {
     private final ProduitStockRepository repository;
+    private final AuthContext authContext;
+    private final LookupService lookupService;
 
     public List<ProduitStock> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public List<ProduitStock> findProduitsEnAlerte() {
-        return repository.findProduitsEnAlerte();
+        return repository.findProduitsEnAlerteByExploitationId(authContext.currentExploitationId());
     }
 
     public ProduitStock findById(Long id) {
@@ -29,6 +31,7 @@ public class ProduitStockService {
     public ProduitStock create(ProduitStockRequest request) {
         ProduitStock produit = new ProduitStock();
         apply(produit, request);
+        produit.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(produit);
     }
 

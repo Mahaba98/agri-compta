@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class UtilisateurService {
     private final UtilisateurRepository repository;
     private final PasswordService passwordService;
+    private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<Utilisateur> findAll() {
         return repository.findAll();
@@ -52,5 +54,9 @@ public class UtilisateurService {
         }
         utilisateur.setRole(request.role());
         utilisateur.setActif(request.actif());
+        Long exploitationId = request.exploitationId() == null
+                ? authContext.currentExploitationId()
+                : request.exploitationId();
+        utilisateur.setExploitation(lookupService.exploitation(exploitationId));
     }
 }

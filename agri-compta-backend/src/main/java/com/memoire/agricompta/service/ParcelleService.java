@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ParcelleService {
     private final ParcelleRepository repository;
+    private final AuthContext authContext;
+    private final LookupService lookupService;
 
     public List<Parcelle> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public Parcelle findById(Long id) {
@@ -25,6 +27,7 @@ public class ParcelleService {
     public Parcelle create(ParcelleRequest request) {
         Parcelle parcelle = new Parcelle();
         apply(parcelle, request);
+        parcelle.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(parcelle);
     }
 

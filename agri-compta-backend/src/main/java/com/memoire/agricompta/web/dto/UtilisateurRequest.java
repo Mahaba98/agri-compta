@@ -11,6 +11,7 @@ public record UtilisateurRequest(
         @Email @NotBlank String email,
         String motDePasse,
         @NotNull Role role,
-        boolean actif
+        boolean actif,
+        Long exploitationId
 ) {
 }

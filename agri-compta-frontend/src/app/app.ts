@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-type Section = 'dashboard' | 'campagnes' | 'parcelles' | 'cultures' | 'operations' | 'recoltes' | 'depenses' | 'recettes' | 'stocks' | 'rapports' | 'utilisateurs';
+type Section = 'dashboard' | 'exploitations' | 'campagnes' | 'parcelles' | 'cultures' | 'operations' | 'recoltes' | 'depenses' | 'recettes' | 'stocks' | 'rapports' | 'utilisateurs';
 type ViewMode = 'list' | 'create' | 'detail' | 'edit';
 type StockFormKind = 'produit' | 'mouvement';
 type UserRole = 'ADMIN' | 'AGRICULTEUR' | 'COMPTABLE';
@@ -55,6 +55,15 @@ interface AuthUser {
   prenom: string;
   email: string;
   role: UserRole;
+  exploitation?: Exploitation | null;
+}
+
+interface Exploitation extends Entity {
+  nom: string;
+  logoUrl?: string;
+  localisation?: string;
+  description?: string;
+  actif?: boolean;
 }
 
 interface LoginResponse {
@@ -66,6 +75,7 @@ interface TokenPayload {
   utilisateurId: number;
   role: UserRole;
   email: string;
+  exploitationId?: number;
   expiresAt: number;
 }
 
@@ -129,6 +139,7 @@ export class App {
   readonly dashboard = signal<Dashboard | null>(null);
   readonly rapport = signal<RapportSynthese | null>(null);
   readonly categories = signal<Entity[]>([]);
+  readonly exploitations = signal<Exploitation[]>([]);
   readonly utilisateurs = signal<Entity[]>([]);
   readonly campagnes = signal<Entity[]>([]);
   readonly parcelles = signal<Entity[]>([]);
@@ -141,6 +152,7 @@ export class App {
 
   readonly navItems: { id: Section; label: string; icon: string }[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: 'layout-dashboard' },
+    { id: 'exploitations', label: 'Exploitations', icon: 'layers' },
     { id: 'campagnes', label: 'Campagnes', icon: 'calendar-days' },
     { id: 'parcelles', label: 'Parcelles', icon: 'map-pinned' },
     { id: 'cultures', label: 'Cultures', icon: 'sprout' },
@@ -200,6 +212,15 @@ export class App {
     email: ['', [Validators.required, Validators.email]],
     motDePasse: [''],
     role: ['AGRICULTEUR' as UserRole, Validators.required],
+    actif: [true, Validators.required],
+    exploitationId: [0, [Validators.required, Validators.min(1)]],
+  });
+
+  readonly exploitationForm = this.fb.group({
+    nom: ['', Validators.required],
+    logoUrl: [''],
+    localisation: [''],
+    description: [''],
     actif: [true, Validators.required],
   });
 
@@ -287,7 +308,7 @@ export class App {
 
   visibleNavItems(): { id: Section; label: string; icon: string }[] {
     return this.navItems.filter((item) => {
-      if (item.id === 'utilisateurs') {
+      if (item.id === 'utilisateurs' || item.id === 'exploitations') {
         return this.currentUser()?.role === 'ADMIN';
       }
       if (item.id === 'rapports') {
@@ -408,14 +429,20 @@ export class App {
     ];
 
     if (this.currentUser()?.role === 'ADMIN') {
+      requests.push(this.fetch<Exploitation[]>('/exploitations').then((value) => this.exploitations.set(value)));
       requests.push(this.fetch<Entity[]>('/utilisateurs').then((value) => this.utilisateurs.set(value)));
     } else {
       const user = this.currentUser();
+      const exploitation = user?.exploitation;
+      this.exploitations.set(exploitation ? [exploitation] : []);
       this.utilisateurs.set(user ? [user as unknown as Entity] : []);
     }
 
     Promise.all(requests)
-      .then(() => this.patchDefaultIds())
+      .then(() => {
+        this.syncCurrentExploitation();
+        this.patchDefaultIds();
+      })
       .catch((err) => this.error.set(this.readError(err)))
       .finally(() => this.loading.set(false));
   }
@@ -515,6 +542,10 @@ export class App {
     this.save('/produits-stock', this.produitForm.getRawValue(), 'Produit enregistré.');
   }
 
+  saveExploitation(): void {
+    this.save('/exploitations', this.exploitationForm.getRawValue(), 'Exploitation enregistrée.');
+  }
+
   saveUtilisateur(): void {
     if (this.mode() === 'create' && !this.utilisateurForm.getRawValue().motDePasse?.trim()) {
       this.error.set('Le mot de passe initial est obligatoire.');
@@ -542,6 +573,8 @@ export class App {
 
   listForCurrentSection(): Entity[] {
     switch (this.section()) {
+      case 'exploitations':
+        return this.exploitations();
       case 'campagnes':
         return this.campagnes();
       case 'parcelles':
@@ -624,6 +657,13 @@ export class App {
 
   listColumns(): ListColumn[] {
     switch (this.section()) {
+      case 'exploitations':
+        return [
+          { label: 'Nom', value: (item) => this.text(item['nom']) },
+          { label: 'Localisation', value: (item) => this.text(item['localisation']) },
+          { label: 'Logo', value: (item) => this.text(item['logoUrl']) },
+          { label: 'Statut', value: (item) => item['actif'] === false ? 'Inactive' : 'Active' },
+        ];
       case 'campagnes':
         return [
           { label: 'Nom', value: (item) => this.text(item['nom']) },
@@ -685,6 +725,7 @@ export class App {
         return [
           { label: 'Nom', value: (item) => `${this.text(item['prenom'])} ${this.text(item['nom'])}` },
           { label: 'Email', value: (item) => this.text(item['email']) },
+          { label: 'Exploitation', value: (item) => this.nestedName(item['exploitation']) },
           { label: 'Rôle', value: (item) => this.text(item['role']) },
           { label: 'Statut', value: (item) => item['actif'] === false ? 'Inactif' : 'Actif' },
         ];
@@ -699,6 +740,11 @@ export class App {
     }
 
     switch (this.section()) {
+      case 'exploitations':
+        return [
+          ...this.listColumns().map((column) => ({ label: column.label, value: column.value(item) })),
+          { label: 'Description', value: this.text(item['description']) },
+        ];
       case 'campagnes':
         return this.listColumns().map((column) => ({ label: column.label, value: column.value(item) }));
       case 'parcelles':
@@ -785,6 +831,18 @@ export class App {
 
   resultLabel(value: number | null | undefined): string {
     return (value ?? 0) < 0 ? 'Perte' : 'Bénéfice';
+  }
+
+  currentExploitationName(): string {
+    return this.currentUser()?.exploitation?.nom || 'Exploitation agricole';
+  }
+
+  currentExploitationLogo(): string {
+    return this.currentUser()?.exploitation?.logoUrl || 'logo-touba-agoro.jpg';
+  }
+
+  defaultExploitationId(): number {
+    return this.currentUser()?.exploitation?.id ?? this.exploitations()[0]?.id ?? 0;
   }
 
   private save(path: string, payload: unknown, successMessage: string): void {
@@ -925,11 +983,12 @@ export class App {
 
     try {
       const payload = atob(encodedPayload.replace(/-/g, '+').replace(/_/g, '/'));
-      const [utilisateurId, role, email, expiresAt] = payload.split('|');
+      const [utilisateurId, role, email, exploitationId, expiresAt] = payload.split('|');
       return {
         utilisateurId: Number(utilisateurId),
         role: role as UserRole,
         email,
+        exploitationId: exploitationId ? Number(exploitationId) : undefined,
         expiresAt: Number(expiresAt),
       };
     } catch {
@@ -937,8 +996,32 @@ export class App {
     }
   }
 
+  private syncCurrentExploitation(): void {
+    const user = this.currentUser();
+    const exploitationId = user?.exploitation?.id;
+    if (!user || !exploitationId) {
+      return;
+    }
+    const exploitation = this.exploitations().find((item) => item.id === exploitationId);
+    if (!exploitation) {
+      return;
+    }
+    const updatedUser = { ...user, exploitation };
+    this.currentUser.set(updatedUser);
+    sessionStorage.setItem('agri-compta-user', JSON.stringify(updatedUser));
+  }
+
   private resetCurrentForm(): void {
     switch (this.section()) {
+      case 'exploitations':
+        this.exploitationForm.reset({
+          nom: '',
+          logoUrl: '',
+          localisation: '',
+          description: '',
+          actif: true,
+        });
+        break;
       case 'campagnes':
         this.campagneForm.reset({ nom: '', dateDebut: '', dateFin: '', statut: '' });
         break;
@@ -1041,6 +1124,7 @@ export class App {
           motDePasse: '',
           role: 'AGRICULTEUR',
           actif: true,
+          exploitationId: this.defaultExploitationId(),
         });
         break;
     }
@@ -1049,6 +1133,15 @@ export class App {
 
   private patchCurrentForm(item: Entity): void {
     switch (this.section()) {
+      case 'exploitations':
+        this.exploitationForm.patchValue({
+          nom: this.text(item['nom']),
+          logoUrl: this.formText(item['logoUrl']),
+          localisation: this.formText(item['localisation']),
+          description: this.formText(item['description']),
+          actif: item['actif'] !== false,
+        });
+        break;
       case 'campagnes':
         this.campagneForm.patchValue({
           nom: this.text(item['nom']),
@@ -1145,6 +1238,7 @@ export class App {
           motDePasse: '',
           role: (this.text(item['role']) || 'AGRICULTEUR') as UserRole,
           actif: item['actif'] !== false,
+          exploitationId: this.nestedId(item['exploitation']) || this.defaultExploitationId(),
         });
         break;
     }
@@ -1158,6 +1252,7 @@ export class App {
     this.depenseForm.patchValue({ utilisateurId });
     this.recetteForm.patchValue({ utilisateurId });
     this.mouvementForm.patchValue({ utilisateurId });
+    this.utilisateurForm.patchValue({ exploitationId: this.defaultExploitationId() });
   }
 
   private cleanOptionalIds<T extends Record<string, unknown>>(payload: T): T {

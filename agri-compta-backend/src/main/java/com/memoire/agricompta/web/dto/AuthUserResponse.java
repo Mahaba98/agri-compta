@@ -8,7 +8,8 @@ public record AuthUserResponse(
         String nom,
         String prenom,
         String email,
-        Role role
+        Role role,
+        ExploitationSummaryResponse exploitation
 ) {
     public static AuthUserResponse from(Utilisateur utilisateur) {
         return new AuthUserResponse(
@@ -16,6 +17,7 @@ public record AuthUserResponse(
                 utilisateur.getNom(),
                 utilisateur.getPrenom(),
                 utilisateur.getEmail(),
-                utilisateur.getRole());
+                utilisateur.getRole(),
+                ExploitationSummaryResponse.from(utilisateur.getExploitation()));
     }
 }

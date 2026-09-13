@@ -57,4 +57,8 @@ public class Culture {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parcelle_id", nullable = false)
     private Parcelle parcelle;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "exploitation_id")
+    private Exploitation exploitation;
 }

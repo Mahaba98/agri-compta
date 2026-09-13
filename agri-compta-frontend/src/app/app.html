@@ -25,9 +25,9 @@
 <main class="app-shell">
   <aside class="sidebar">
     <div class="brand">
-      <img class="brand-logo" src="logo-touba-agoro.jpg" alt="Touba Agoro Business Diaw" />
+      <img class="brand-logo" [src]="currentExploitationLogo()" [alt]="currentExploitationName()" />
       <div>
-        <strong>Touba Agoro</strong>
+        <strong>{{ currentExploitationName() }}</strong>
         <small>Gestion agricole</small>
       </div>
     </div>
@@ -53,7 +53,7 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Exploitation agricole</p>
-        <h1>Gestion comptable et coûts de production</h1>
+        <h1>{{ currentExploitationName() }}</h1>
       </div>
       <div class="topbar-actions">
         <div class="user-chip">
@@ -235,7 +235,7 @@
               </form>
 
               <div class="print-report-title">
-                <strong>Touba Agoro - Rapport de gestion agricole</strong>
+                <strong>{{ currentExploitationName() }} - Rapport de gestion agricole</strong>
                 <span>Période et filtres sélectionnés dans l'application</span>
               </div>
 
@@ -496,6 +496,25 @@
             </form>
           }
 
+          @if (section() === 'exploitations') {
+            <form class="form-grid" [formGroup]="exploitationForm" (ngSubmit)="saveExploitation()">
+              <label>Nom <input formControlName="nom" placeholder="Ex. Ferme Moustapha" /></label>
+              <label>Logo URL <input formControlName="logoUrl" placeholder="Ex. logo-ferme.png ou https://..." /></label>
+              <label>Localisation <input formControlName="localisation" placeholder="Ex. Saint-Louis" /></label>
+              <label>Statut
+                <select formControlName="actif">
+                  <option [ngValue]="true">Active</option>
+                  <option [ngValue]="false">Inactive</option>
+                </select>
+              </label>
+              <label class="wide">Description <textarea formControlName="description" placeholder="Informations complémentaires"></textarea></label>
+              <button type="submit" class="with-icon" [disabled]="exploitationForm.invalid">
+                <span class="button-icon" [style.--icon-url]="'url(' + iconPath('save') + ')'"></span>
+                {{ mode() === 'create' ? 'Créer' : 'Mettre à jour' }}
+              </button>
+            </form>
+          }
+
           @if (section() === 'recoltes') {
             <form class="form-grid" [formGroup]="recolteForm" (ngSubmit)="saveRecolte()">
               <label>Date récolte <input type="date" formControlName="dateRecolte" placeholder="Date récolte" /></label>
@@ -658,6 +677,14 @@
                   <option value="ADMIN">ADMIN</option>
                   <option value="AGRICULTEUR">AGRICULTEUR</option>
                   <option value="COMPTABLE">COMPTABLE</option>
+                </select>
+              </label>
+              <label>Exploitation
+                <select formControlName="exploitationId">
+                  <option [ngValue]="0">Sélectionner</option>
+                  @for (item of exploitations(); track item.id) {
+                    <option [ngValue]="item.id">{{ item.nom }}</option>
+                  }
                 </select>
               </label>
               <label>Statut

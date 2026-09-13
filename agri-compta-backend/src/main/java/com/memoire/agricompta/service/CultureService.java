@@ -15,9 +15,10 @@ import org.springframework.stereotype.Service;
 public class CultureService {
     private final CultureRepository repository;
     private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<Culture> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public Culture findById(Long id) {
@@ -28,6 +29,7 @@ public class CultureService {
     public Culture create(CultureRequest request) {
         Culture culture = new Culture();
         apply(culture, request);
+        culture.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(culture);
     }
 

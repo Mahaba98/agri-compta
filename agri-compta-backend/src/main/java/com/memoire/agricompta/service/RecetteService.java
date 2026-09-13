@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 public class RecetteService {
     private final RecetteRepository repository;
     private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<Recette> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public Recette findById(Long id) {
@@ -26,6 +27,7 @@ public class RecetteService {
     public Recette create(RecetteRequest request) {
         Recette recette = new Recette();
         apply(recette, request);
+        recette.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(recette);
     }
 

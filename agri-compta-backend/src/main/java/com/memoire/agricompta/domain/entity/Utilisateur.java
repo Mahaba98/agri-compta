@@ -8,7 +8,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -45,6 +48,10 @@ public class Utilisateur {
 
     @Column(nullable = false)
     private boolean actif = true;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "exploitation_id")
+    private Exploitation exploitation;
 
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;

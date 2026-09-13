@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CampagneAgricoleService {
     private final CampagneAgricoleRepository repository;
+    private final AuthContext authContext;
+    private final LookupService lookupService;
 
     public List<CampagneAgricole> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public CampagneAgricole findById(Long id) {
@@ -27,6 +29,7 @@ public class CampagneAgricoleService {
     public CampagneAgricole create(CampagneAgricoleRequest request) {
         CampagneAgricole campagne = new CampagneAgricole();
         apply(campagne, request);
+        campagne.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(campagne);
     }
 

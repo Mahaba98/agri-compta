@@ -33,6 +33,7 @@ public class RapportService {
     private final RecolteRepository recolteRepository;
     private final OperationAgricoleRepository operationRepository;
     private final ProduitStockRepository produitStockRepository;
+    private final AuthContext authContext;
 
     public RapportSyntheseResponse synthese(
             LocalDate dateDebut,
@@ -41,25 +42,26 @@ public class RapportService {
             Long cultureId) {
         validateDates(dateDebut, dateFin);
 
-        List<Culture> cultures = cultureRepository.findAll().stream()
+        Long exploitationId = authContext.currentExploitationId();
+        List<Culture> cultures = cultureRepository.findByExploitationId(exploitationId).stream()
                 .filter(culture -> campagneId == null || culture.getCampagne().getId().equals(campagneId))
                 .filter(culture -> cultureId == null || culture.getId().equals(cultureId))
                 .toList();
         Set<Long> cultureIds = cultures.stream().map(Culture::getId).collect(Collectors.toSet());
 
-        List<Depense> depenses = depenseRepository.findAll().stream()
+        List<Depense> depenses = depenseRepository.findByExploitationId(exploitationId).stream()
                 .filter(depense -> cultureIds.contains(depense.getCulture().getId()))
                 .filter(depense -> inRange(depense.getDateDepense(), dateDebut, dateFin))
                 .toList();
-        List<Recette> recettes = recetteRepository.findAll().stream()
+        List<Recette> recettes = recetteRepository.findByExploitationId(exploitationId).stream()
                 .filter(recette -> cultureIds.contains(recette.getCulture().getId()))
                 .filter(recette -> inRange(recette.getDateRecette(), dateDebut, dateFin))
                 .toList();
-        List<Recolte> recoltes = recolteRepository.findAll().stream()
+        List<Recolte> recoltes = recolteRepository.findByExploitationId(exploitationId).stream()
                 .filter(recolte -> cultureIds.contains(recolte.getCulture().getId()))
                 .filter(recolte -> inRange(recolte.getDateRecolte(), dateDebut, dateFin))
                 .toList();
-        List<OperationAgricole> operations = operationRepository.findAll().stream()
+        List<OperationAgricole> operations = operationRepository.findByExploitationId(exploitationId).stream()
                 .filter(operation -> cultureIds.contains(operation.getCulture().getId()))
                 .filter(operation -> inRange(operation.getDateOperation(), dateDebut, dateFin))
                 .toList();
@@ -87,8 +89,8 @@ public class RapportService {
                 totalQuantite,
                 operations.size(),
                 recoltes.size(),
-                valeurStock(),
-                produitStockRepository.findProduitsEnAlerte().size(),
+                valeurStock(exploitationId),
+                produitStockRepository.findProduitsEnAlerteByExploitationId(exploitationId).size(),
                 lignes);
     }
 
@@ -187,8 +189,8 @@ public class RapportService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal valeurStock() {
-        return produitStockRepository.findAll().stream()
+    private BigDecimal valeurStock(Long exploitationId) {
+        return produitStockRepository.findByExploitationId(exploitationId).stream()
                 .map(this::valeurProduit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

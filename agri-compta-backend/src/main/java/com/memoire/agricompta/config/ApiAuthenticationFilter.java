@@ -49,6 +49,11 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (path.startsWith("/api/exploitations") && authenticatedUser.get().role() != Role.ADMIN) {
+            writeError(response, HttpServletResponse.SC_FORBIDDEN, "Accès réservé à l'administrateur.");
+            return;
+        }
+
         if (path.startsWith("/api/rapports")
                 && authenticatedUser.get().role() != Role.ADMIN
                 && authenticatedUser.get().role() != Role.COMPTABLE) {

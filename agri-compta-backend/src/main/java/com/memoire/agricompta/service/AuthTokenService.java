@@ -28,6 +28,7 @@ public class AuthTokenService {
                 String.valueOf(utilisateur.getId()),
                 utilisateur.getRole().name(),
                 utilisateur.getEmail(),
+                utilisateur.getExploitation() == null ? "" : String.valueOf(utilisateur.getExploitation().getId()),
                 String.valueOf(expiresAt));
         String encodedPayload = base64Url(payload.getBytes(StandardCharsets.UTF_8));
         return encodedPayload + "." + sign(encodedPayload);
@@ -44,19 +45,20 @@ public class AuthTokenService {
         }
 
         String payload = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
-        String[] values = payload.split("\\|", 4);
-        if (values.length != 4) {
+        String[] values = payload.split("\\|", 5);
+        if (values.length != 5) {
             return Optional.empty();
         }
 
         try {
-            if (Long.parseLong(values[3]) < Instant.now().getEpochSecond()) {
+            if (Long.parseLong(values[4]) < Instant.now().getEpochSecond()) {
                 return Optional.empty();
             }
             return Optional.of(new AuthenticatedUser(
                     Long.parseLong(values[0]),
                     Role.valueOf(values[1]),
-                    values[2]));
+                    values[2],
+                    values[3].isBlank() ? null : Long.parseLong(values[3])));
         } catch (IllegalArgumentException ex) {
             return Optional.empty();
         }
@@ -76,6 +78,6 @@ public class AuthTokenService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(value);
     }
 
-    public record AuthenticatedUser(Long id, Role role, String email) {
+    public record AuthenticatedUser(Long id, Role role, String email, Long exploitationId) {
     }
 }

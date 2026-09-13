@@ -1,7 +1,6 @@
 package com.memoire.agricompta.service;
 
 import com.memoire.agricompta.domain.entity.Culture;
-import com.memoire.agricompta.domain.entity.OperationAgricole;
 import com.memoire.agricompta.repository.CultureRepository;
 import com.memoire.agricompta.repository.DepenseRepository;
 import com.memoire.agricompta.repository.OperationAgricoleRepository;
@@ -11,7 +10,6 @@ import com.memoire.agricompta.web.dto.CultureRentabiliteResponse;
 import com.memoire.agricompta.web.dto.DashboardResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +21,16 @@ public class DashboardService {
     private final CultureRepository cultureRepository;
     private final OperationAgricoleRepository operationRepository;
     private final ProduitStockRepository produitStockRepository;
+    private final AuthContext authContext;
 
     public DashboardResponse getDashboard() {
-        BigDecimal totalDepenses = depenseRepository.totalDepenses();
-        BigDecimal totalOperations = sumOperations(operationRepository.findAll());
-        BigDecimal totalRecettes = recetteRepository.totalRecettes();
+        Long exploitationId = authContext.currentExploitationId();
+        BigDecimal totalDepenses = depenseRepository.totalDepensesByExploitationId(exploitationId);
+        BigDecimal totalOperations = operationRepository.totalOperationsByExploitationId(exploitationId);
+        BigDecimal totalRecettes = recetteRepository.totalRecettesByExploitationId(exploitationId);
         BigDecimal beneficeGlobal = totalRecettes.subtract(totalDepenses).subtract(totalOperations);
 
-        List<CultureRentabiliteResponse> rentabilites = cultureRepository.findAll().stream()
+        var rentabilites = cultureRepository.findByExploitationId(exploitationId).stream()
                 .map(this::rentabiliteCulture)
                 .toList();
 
@@ -40,17 +40,16 @@ public class DashboardService {
                 totalRecettes,
                 beneficeGlobal,
                 rentabilites,
-                produitStockRepository.findProduitsEnAlerte()
+                produitStockRepository.findProduitsEnAlerteByExploitationId(exploitationId)
         );
     }
 
     private CultureRentabiliteResponse rentabiliteCulture(Culture culture) {
-        BigDecimal totalDepenses = depenseRepository.totalByCultureId(culture.getId());
-        BigDecimal totalOperations = sumOperations(operationRepository.findAll().stream()
-                .filter(operation -> operation.getCulture().getId().equals(culture.getId()))
-                .toList());
+        Long exploitationId = authContext.currentExploitationId();
+        BigDecimal totalDepenses = depenseRepository.totalByExploitationIdAndCultureId(exploitationId, culture.getId());
+        BigDecimal totalOperations = operationRepository.totalByExploitationIdAndCultureId(exploitationId, culture.getId());
         BigDecimal coutTotal = totalDepenses.add(totalOperations);
-        BigDecimal recetteTotale = recetteRepository.totalByCultureId(culture.getId());
+        BigDecimal recetteTotale = recetteRepository.totalByExploitationIdAndCultureId(exploitationId, culture.getId());
         BigDecimal benefice = recetteTotale.subtract(coutTotal);
         BigDecimal surface = culture.getSurfaceHa();
         BigDecimal coutParHectare = divide(coutTotal, surface);
@@ -68,12 +67,6 @@ public class DashboardService {
                 coutParHectare,
                 margeParHectare
         );
-    }
-
-    private BigDecimal sumOperations(List<OperationAgricole> operations) {
-        return operations.stream()
-                .map(OperationAgricole::getCoutMainOeuvre)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal divide(BigDecimal amount, BigDecimal divisor) {

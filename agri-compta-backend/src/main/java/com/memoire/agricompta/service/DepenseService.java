@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 public class DepenseService {
     private final DepenseRepository repository;
     private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<Depense> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public Depense findById(Long id) {
@@ -26,6 +27,7 @@ public class DepenseService {
     public Depense create(DepenseRequest request) {
         Depense depense = new Depense();
         apply(depense, request);
+        depense.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(depense);
     }
 

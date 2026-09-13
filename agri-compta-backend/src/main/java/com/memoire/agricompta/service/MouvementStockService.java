@@ -20,9 +20,10 @@ public class MouvementStockService {
     private final MouvementStockRepository repository;
     private final ProduitStockRepository produitStockRepository;
     private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<MouvementStock> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public MouvementStock findById(Long id) {
@@ -45,6 +46,7 @@ public class MouvementStockService {
         mouvement.setCulture(request.cultureId() == null ? null : lookupService.culture(request.cultureId()));
         mouvement.setOperationAgricole(request.operationAgricoleId() == null ? null : lookupService.operation(request.operationAgricoleId()));
         mouvement.setUtilisateur(request.utilisateurId() == null ? null : lookupService.utilisateur(request.utilisateurId()));
+        mouvement.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
 
         produitStockRepository.save(produit);
         return repository.save(mouvement);

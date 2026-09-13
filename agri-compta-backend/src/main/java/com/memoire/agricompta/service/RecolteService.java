@@ -19,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecolteService {
     private final RecolteRepository repository;
     private final LookupService lookupService;
+    private final AuthContext authContext;
 
     public List<Recolte> findAll() {
-        return repository.findAll();
+        return repository.findByExploitationId(authContext.currentExploitationId());
     }
 
     public Recolte findById(Long id) {
@@ -32,6 +33,7 @@ public class RecolteService {
     public Recolte create(RecolteRequest request) {
         Recolte recolte = new Recolte();
         apply(recolte, request);
+        recolte.setExploitation(lookupService.exploitation(authContext.currentExploitationId()));
         return repository.save(recolte);
     }
 

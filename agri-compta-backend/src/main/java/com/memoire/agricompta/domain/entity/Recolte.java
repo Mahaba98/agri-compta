@@ -53,6 +53,10 @@ public class Recolte {
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "exploitation_id")
+    private Exploitation exploitation;
+
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 

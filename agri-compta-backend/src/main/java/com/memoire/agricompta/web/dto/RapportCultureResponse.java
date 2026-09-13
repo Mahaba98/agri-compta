@@ -9,6 +9,7 @@ public record RapportCultureResponse(
         String parcelle,
         BigDecimal surfaceHa,
         BigDecimal totalDepenses,
+        BigDecimal totalOperations,
         BigDecimal totalRecettes,
         BigDecimal benefice,
         BigDecimal quantiteRecoltee,

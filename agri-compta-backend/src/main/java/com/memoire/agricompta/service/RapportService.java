@@ -65,6 +65,7 @@ public class RapportService {
                 .toList();
 
         BigDecimal totalDepenses = sumDepenses(depenses);
+        BigDecimal totalOperations = sumOperations(operations);
         BigDecimal totalRecettes = sumRecettes(recettes);
         BigDecimal totalQuantite = recoltes.stream()
                 .map(Recolte::getQuantite)
@@ -80,8 +81,9 @@ public class RapportService {
                 campagneId,
                 cultureId,
                 totalDepenses,
+                totalOperations,
                 totalRecettes,
-                totalRecettes.subtract(totalDepenses),
+                totalRecettes.subtract(totalDepenses).subtract(totalOperations),
                 totalQuantite,
                 operations.size(),
                 recoltes.size(),
@@ -97,13 +99,14 @@ public class RapportService {
             Long cultureId) {
         RapportSyntheseResponse rapport = synthese(dateDebut, dateFin, campagneId, cultureId);
         StringBuilder csv = new StringBuilder("\uFEFF");
-        csv.append("Culture;Campagne;Parcelle;Surface ha;Dépenses;Recettes;Bénéfice;Quantité récoltée;Unité;Opérations;Récoltes\r\n");
+        csv.append("Culture;Campagne;Parcelle;Surface ha;Dépenses;Montant opérations;Recettes;Bénéfice;Quantité récoltée;Unité;Nombre opérations;Récoltes\r\n");
         for (RapportCultureResponse ligne : rapport.cultures()) {
             csv.append(escape(ligne.culture())).append(';')
                     .append(escape(ligne.campagne())).append(';')
                     .append(escape(ligne.parcelle())).append(';')
                     .append(ligne.surfaceHa()).append(';')
                     .append(ligne.totalDepenses()).append(';')
+                    .append(ligne.totalOperations()).append(';')
                     .append(ligne.totalRecettes()).append(';')
                     .append(ligne.benefice()).append(';')
                     .append(ligne.quantiteRecoltee()).append(';')
@@ -113,6 +116,7 @@ public class RapportService {
         }
         csv.append("\r\nTOTAL;;;;")
                 .append(rapport.totalDepenses()).append(';')
+                .append(rapport.totalOperations()).append(';')
                 .append(rapport.totalRecettes()).append(';')
                 .append(rapport.benefice()).append(';')
                 .append(rapport.totalQuantiteRecoltee()).append(";;")
@@ -136,11 +140,12 @@ public class RapportService {
         List<Recolte> recoltesCulture = recoltes.stream()
                 .filter(item -> item.getCulture().getId().equals(culture.getId()))
                 .toList();
-        long operationsCulture = operations.stream()
+        List<OperationAgricole> operationsCulture = operations.stream()
                 .filter(item -> item.getCulture().getId().equals(culture.getId()))
-                .count();
+                .toList();
 
         BigDecimal totalDepenses = sumDepenses(depensesCulture);
+        BigDecimal totalOperations = sumOperations(operationsCulture);
         BigDecimal totalRecettes = sumRecettes(recettesCulture);
         BigDecimal quantite = recoltesCulture.stream()
                 .map(Recolte::getQuantite)
@@ -159,11 +164,12 @@ public class RapportService {
                 culture.getParcelle().getNom(),
                 culture.getSurfaceHa(),
                 totalDepenses,
+                totalOperations,
                 totalRecettes,
-                totalRecettes.subtract(totalDepenses),
+                totalRecettes.subtract(totalDepenses).subtract(totalOperations),
                 quantite,
                 unite,
-                operationsCulture,
+                operationsCulture.size(),
                 recoltesCulture.size());
     }
 
@@ -173,6 +179,12 @@ public class RapportService {
 
     private BigDecimal sumRecettes(List<Recette> recettes) {
         return recettes.stream().map(Recette::getMontant).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal sumOperations(List<OperationAgricole> operations) {
+        return operations.stream()
+                .map(OperationAgricole::getCoutMainOeuvre)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal valeurStock() {

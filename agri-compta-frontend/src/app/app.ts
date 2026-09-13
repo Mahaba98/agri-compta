@@ -73,6 +73,7 @@ interface RapportCulture {
   parcelle: string;
   surfaceHa: number;
   totalDepenses: number;
+  totalOperations: number;
   totalRecettes: number;
   benefice: number;
   quantiteRecoltee: number;
@@ -87,6 +88,7 @@ interface RapportSynthese {
   campagneId?: number;
   cultureId?: number;
   totalDepenses: number;
+  totalOperations: number;
   totalRecettes: number;
   benefice: number;
   totalQuantiteRecoltee: number;

@@ -233,6 +233,7 @@
 
               <div class="metrics report-metrics">
                 <article><span>Dépenses</span><strong>{{ formatAmount(rapport()?.totalDepenses) }}</strong></article>
+                <article><span>Opérations</span><strong>{{ formatAmount(rapport()?.totalOperations) }}</strong></article>
                 <article><span>Recettes</span><strong>{{ formatAmount(rapport()?.totalRecettes) }}</strong></article>
                 <article [class.positive]="(rapport()?.benefice ?? 0) >= 0" [class.negative]="(rapport()?.benefice ?? 0) < 0"><span>Bénéfice</span><strong>{{ formatAmount(rapport()?.benefice) }}</strong></article>
                 <article><span>Quantité récoltée</span><strong>{{ rapport()?.totalQuantiteRecoltee ?? 0 }}</strong></article>
@@ -255,10 +256,11 @@
                       <th>Parcelle</th>
                       <th>Surface</th>
                       <th>Dépenses</th>
+                      <th>Opérations</th>
                       <th>Recettes</th>
                       <th>Bénéfice</th>
                       <th>Récolté</th>
-                      <th>Opérations</th>
+                      <th>Nb opérations</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,13 +271,14 @@
                         <td>{{ row.parcelle }}</td>
                         <td>{{ row.surfaceHa }} ha</td>
                         <td>{{ formatAmount(row.totalDepenses) }}</td>
+                        <td>{{ formatAmount(row.totalOperations) }}</td>
                         <td>{{ formatAmount(row.totalRecettes) }}</td>
                         <td>{{ formatAmount(row.benefice) }}</td>
                         <td>{{ row.quantiteRecoltee }} {{ row.unite }}</td>
                         <td>{{ row.nombreOperations }}</td>
                       </tr>
                     } @empty {
-                      <tr><td colspan="9">Aucune donnée pour les filtres sélectionnés.</td></tr>
+                      <tr><td colspan="10">Aucune donnée pour les filtres sélectionnés.</td></tr>
                     }
                   </tbody>
                 </table>

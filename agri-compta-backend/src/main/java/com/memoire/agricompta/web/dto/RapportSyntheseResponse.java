@@ -10,6 +10,7 @@ public record RapportSyntheseResponse(
         Long campagneId,
         Long cultureId,
         BigDecimal totalDepenses,
+        BigDecimal totalOperations,
         BigDecimal totalRecettes,
         BigDecimal benefice,
         BigDecimal totalQuantiteRecoltee,

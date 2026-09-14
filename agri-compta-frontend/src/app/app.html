@@ -294,15 +294,7 @@
             </section>
           } @else {
           <div class="list-toolbar">
-            <label class="search-field">Recherche
-              <input
-                type="search"
-                [value]="searchTerm()"
-                (input)="updateSearch($any($event.target).value)"
-                placeholder="Rechercher dans la liste"
-              />
-            </label>
-            @if (canFilterByCulture()) {
+            @if (section() === 'operations' || section() === 'recoltes' || section() === 'depenses' || section() === 'recettes') {
               <label class="culture-filter-field">Culture
                 <select [value]="cultureFilterId()" (change)="updateCultureFilter($any($event.target).value)">
                   <option value="0">Toutes les cultures</option>
@@ -312,6 +304,14 @@
                 </select>
               </label>
             }
+            <label class="search-field">Recherche
+              <input
+                type="search"
+                [value]="searchTerm()"
+                (input)="updateSearch($any($event.target).value)"
+                placeholder="Rechercher dans la liste"
+              />
+            </label>
             <label class="page-size-field">Lignes
               <select [value]="pageSize()" (change)="updatePageSize($any($event.target).value)">
                 <option value="5">5</option>

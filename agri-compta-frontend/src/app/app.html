@@ -302,6 +302,16 @@
                 placeholder="Rechercher dans la liste"
               />
             </label>
+            @if (canFilterByCulture()) {
+              <label class="culture-filter-field">Culture
+                <select [value]="cultureFilterId()" (change)="updateCultureFilter($any($event.target).value)">
+                  <option value="0">Toutes les cultures</option>
+                  @for (item of cultures(); track item.id) {
+                    <option [value]="item.id">{{ item['nom'] }}</option>
+                  }
+                </select>
+              </label>
+            }
             <label class="page-size-field">Lignes
               <select [value]="pageSize()" (change)="updatePageSize($any($event.target).value)">
                 <option value="5">5</option>
@@ -336,7 +346,7 @@
                 } @empty {
                   <tr>
                     <td [attr.colspan]="listColumns().length + 1">
-                      {{ searchTerm() ? 'Aucun élément ne correspond à la recherche.' : 'Aucun élément enregistré.' }}
+                      {{ searchTerm() || cultureFilterId() ? 'Aucun élément ne correspond aux filtres.' : 'Aucun élément enregistré.' }}
                     </td>
                   </tr>
                 }

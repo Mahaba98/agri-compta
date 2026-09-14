@@ -128,6 +128,7 @@ export class App {
   readonly stockFormKind = signal<StockFormKind>('produit');
   readonly selected = signal<Entity | null>(null);
   readonly searchTerm = signal('');
+  readonly cultureFilterId = signal(0);
   readonly pageIndex = signal(1);
   readonly pageSize = signal(10);
   readonly loading = signal(false);
@@ -600,7 +601,10 @@ export class App {
 
   filteredListForCurrentSection(): Entity[] {
     const term = this.searchTerm().trim().toLocaleLowerCase();
-    const items = this.listForCurrentSection();
+    const cultureId = this.cultureFilterId();
+    const items = this.listForCurrentSection().filter((item) => {
+      return !this.canFilterByCulture() || !cultureId || this.nestedId(item['culture']) === cultureId;
+    });
     if (!term) {
       return items;
     }
@@ -639,6 +643,11 @@ export class App {
 
   updateSearch(value: string): void {
     this.searchTerm.set(value);
+    this.pageIndex.set(1);
+  }
+
+  updateCultureFilter(value: string): void {
+    this.cultureFilterId.set(Number(value) || 0);
     this.pageIndex.set(1);
   }
 
@@ -833,6 +842,10 @@ export class App {
     return (value ?? 0) < 0 ? 'Perte' : 'Bénéfice';
   }
 
+  canFilterByCulture(): boolean {
+    return ['operations', 'recoltes', 'depenses', 'recettes'].includes(this.section());
+  }
+
   currentExploitationName(): string {
     return this.currentUser()?.exploitation?.nom || 'Exploitation agricole';
   }
@@ -881,6 +894,7 @@ export class App {
 
   private resetListControls(): void {
     this.searchTerm.set('');
+    this.cultureFilterId.set(0);
     this.pageIndex.set(1);
   }
 

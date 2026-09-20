@@ -304,6 +304,16 @@
                 </select>
               </label>
             }
+            @if (section() === 'operations' || section() === 'recoltes' || section() === 'depenses' || section() === 'recettes') {
+              <label class="year-filter-field">Année
+                <select [value]="yearFilter()" (change)="updateYearFilter($any($event.target).value)">
+                  <option value="0">Toutes les années</option>
+                  @for (year of yearOptionsForCurrentSection(); track year) {
+                    <option [value]="year">{{ year }}</option>
+                  }
+                </select>
+              </label>
+            }
             <label class="search-field">Recherche
               <input
                 type="search"
@@ -346,7 +356,7 @@
                 } @empty {
                   <tr>
                     <td [attr.colspan]="listColumns().length + 1">
-                      {{ searchTerm() || cultureFilterId() ? 'Aucun élément ne correspond aux filtres.' : 'Aucun élément enregistré.' }}
+                      {{ searchTerm() || cultureFilterId() || yearFilter() ? 'Aucun élément ne correspond aux filtres.' : 'Aucun élément enregistré.' }}
                     </td>
                   </tr>
                 }

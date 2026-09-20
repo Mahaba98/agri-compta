@@ -129,6 +129,7 @@ export class App {
   readonly selected = signal<Entity | null>(null);
   readonly searchTerm = signal('');
   readonly cultureFilterId = signal(0);
+  readonly yearFilter = signal(0);
   readonly pageIndex = signal(1);
   readonly pageSize = signal(10);
   readonly loading = signal(false);
@@ -602,8 +603,11 @@ export class App {
   filteredListForCurrentSection(): Entity[] {
     const term = this.searchTerm().trim().toLocaleLowerCase();
     const cultureId = this.cultureFilterId();
+    const year = this.yearFilter();
     const items = this.listForCurrentSection().filter((item) => {
-      return !this.canFilterByCulture() || !cultureId || this.nestedId(item['culture']) === cultureId;
+      const cultureMatches = !this.canFilterByCulture() || !cultureId || this.nestedId(item['culture']) === cultureId;
+      const yearMatches = !this.canFilterByYear() || !year || this.itemYear(item) === year;
+      return cultureMatches && yearMatches;
     });
     if (!term) {
       return items;
@@ -648,6 +652,11 @@ export class App {
 
   updateCultureFilter(value: string): void {
     this.cultureFilterId.set(Number(value) || 0);
+    this.pageIndex.set(1);
+  }
+
+  updateYearFilter(value: string): void {
+    this.yearFilter.set(Number(value) || 0);
     this.pageIndex.set(1);
   }
 
@@ -846,6 +855,21 @@ export class App {
     return ['operations', 'recoltes', 'depenses', 'recettes'].includes(this.section());
   }
 
+  canFilterByYear(): boolean {
+    return this.canFilterByCulture();
+  }
+
+  yearOptionsForCurrentSection(): number[] {
+    if (!this.canFilterByYear()) {
+      return [];
+    }
+    return Array.from(new Set(
+      this.listForCurrentSection()
+        .map((item) => this.itemYear(item))
+        .filter((year): year is number => year !== null),
+    )).sort((first, second) => second - first);
+  }
+
   currentExploitationName(): string {
     return this.currentUser()?.exploitation?.nom || 'Exploitation agricole';
   }
@@ -895,6 +919,7 @@ export class App {
   private resetListControls(): void {
     this.searchTerm.set('');
     this.cultureFilterId.set(0);
+    this.yearFilter.set(0);
     this.pageIndex.set(1);
   }
 
@@ -915,6 +940,27 @@ export class App {
       ...columnText,
       ...this.flattenSearchValues(item),
     ].join(' ').toLocaleLowerCase();
+  }
+
+  private itemYear(item: Entity): number | null {
+    const dateValue = this.text(item[this.dateFieldForCurrentSection()]);
+    const year = Number(dateValue.slice(0, 4));
+    return Number.isInteger(year) && year > 0 ? year : null;
+  }
+
+  private dateFieldForCurrentSection(): string {
+    switch (this.section()) {
+      case 'operations':
+        return 'dateOperation';
+      case 'recoltes':
+        return 'dateRecolte';
+      case 'depenses':
+        return 'dateDepense';
+      case 'recettes':
+        return 'dateRecette';
+      default:
+        return '';
+    }
   }
 
   private flattenSearchValues(value: unknown): string[] {

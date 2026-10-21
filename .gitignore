@@ -22,7 +22,12 @@ Thumbs.db
 *.log
 *.tmp
 *.temp
+~$*
 
 # Generated render folders
 render_*/
 render_sections_*/
+
+# Local private notes and archive
+/Mémoire/agri-compta-backend/a remettre après.txt
+/Mémoire.zip
